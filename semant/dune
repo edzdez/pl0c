@@ -1,0 +1,5 @@
+(library
+ (name semant)
+ (libraries core ast)
+ (preprocess
+  (pps ppx_jane)))
