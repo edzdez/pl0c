@@ -7,10 +7,10 @@ type src_loc =
   }
 [@@deriving sexp]
 
-let of_position ({ pos_fname; pos_lnum; pos_cnum; _ } : Lexing.position) =
+let of_position ({ pos_fname; pos_lnum; pos_cnum; pos_bol; _ } : Lexing.position) =
   { filename = (if String.is_empty pos_fname then None else Some pos_fname)
   ; line_no = pos_lnum
-  ; col_no = pos_cnum
+  ; col_no = pos_cnum - pos_bol
   }
 ;;
 
