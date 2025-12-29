@@ -2,7 +2,7 @@
 
 (library
  (name pl0c_test)
- (libraries core parse)
+ (libraries core ast parse)
  (preprocess
   (pps ppx_jane))
  (inline_tests

@@ -10,6 +10,7 @@ The language has been extended to support the following features:
 In the future, we hope to support some additional features:
 
 - Floating-point numbers.
+- More logical operators.
 - Strings.
 - `else` and `else if`
 - Arrays.

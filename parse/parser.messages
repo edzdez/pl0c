@@ -1,0 +1,639 @@
+program: WALRUS
+##
+## Ends in an error in state: 0.
+##
+## program' -> . program [ # ]
+##
+## The known suffix of the stack is as follows:
+##
+##
+
+Illegal token.
+
+program: CONST WHILE
+##
+## Ends in an error in state: 2.
+##
+## const_decl -> CONST . const_assignment_list SEMICOLON [ WHILE VAR QUESTION PROCEDURE IF IDENT CALL BEGIN BANG ]
+##
+## The known suffix of the stack is as follows:
+## CONST
+##
+program: CONST IDENT EQ NUMBER COMMA WHILE
+##
+## Ends in an error in state: 7.
+##
+## const_assignment_list -> m(IDENT) EQ NUMBER COMMA . const_assignment_list [ SEMICOLON ]
+##
+## The known suffix of the stack is as follows:
+## m(IDENT) EQ NUMBER COMMA
+##
+
+Illegal token in [const] declaration. Expected <ident>.
+
+program: CONST IDENT WHILE
+##
+## Ends in an error in state: 4.
+##
+## const_assignment_list -> m(IDENT) . EQ NUMBER [ SEMICOLON ]
+## const_assignment_list -> m(IDENT) . EQ NUMBER COMMA const_assignment_list [ SEMICOLON ]
+##
+## The known suffix of the stack is as follows:
+## m(IDENT)
+##
+
+Illegal token in [const] declaration. Expected [=].
+
+program: CONST IDENT EQ WHILE
+##
+## Ends in an error in state: 5.
+##
+## const_assignment_list -> m(IDENT) EQ . NUMBER [ SEMICOLON ]
+## const_assignment_list -> m(IDENT) EQ . NUMBER COMMA const_assignment_list [ SEMICOLON ]
+##
+## The known suffix of the stack is as follows:
+## m(IDENT) EQ
+##
+
+Illegal token in [const] declaration. Expected <number>.
+
+program: CONST IDENT EQ NUMBER WHILE
+##
+## Ends in an error in state: 6.
+##
+## const_assignment_list -> m(IDENT) EQ NUMBER . [ SEMICOLON ]
+## const_assignment_list -> m(IDENT) EQ NUMBER . COMMA const_assignment_list [ SEMICOLON ]
+##
+## The known suffix of the stack is as follows:
+## m(IDENT) EQ NUMBER
+##
+
+Illegal token in [const] declaration. Expected [,] or [;].
+
+program: CONST IDENT EQ NUMBER SEMICOLON WALRUS
+##
+## Ends in an error in state: 12.
+##
+## block -> const_decl . var_decl proc_decl stmt [ SEMICOLON DOT ]
+##
+## The known suffix of the stack is as follows:
+## const_decl
+##
+
+Illegal token after [const] declaration.
+
+program: VAR WHILE
+##
+## Ends in an error in state: 13.
+##
+## var_decl -> VAR . ident_list SEMICOLON [ WHILE QUESTION PROCEDURE IF IDENT CALL BEGIN BANG ]
+##
+## The known suffix of the stack is as follows:
+## VAR
+##
+program: VAR IDENT COMMA WHILE
+##
+## Ends in an error in state: 15.
+##
+## ident_list -> m(IDENT) COMMA . ident_list [ SEMICOLON ]
+##
+## The known suffix of the stack is as follows:
+## m(IDENT) COMMA
+##
+
+Illegal token in [var] declaration. Expected <ident>.
+
+program: VAR IDENT WHILE
+##
+## Ends in an error in state: 14.
+##
+## ident_list -> m(IDENT) . [ SEMICOLON ]
+## ident_list -> m(IDENT) . COMMA ident_list [ SEMICOLON ]
+##
+## The known suffix of the stack is as follows:
+## m(IDENT)
+##
+
+Illegal token in [var] declaration. Expected [,] or [;].
+
+program: VAR IDENT SEMICOLON WALRUS
+##
+## Ends in an error in state: 19.
+##
+## block -> const_decl var_decl . proc_decl stmt [ SEMICOLON DOT ]
+##
+## The known suffix of the stack is as follows:
+## const_decl var_decl
+##
+
+Illegal token after [var] declaration.
+
+program: PROCEDURE WHILE
+##
+## Ends in an error in state: 20.
+##
+## proc_decl -> PROCEDURE . m(IDENT) SEMICOLON block SEMICOLON proc_decl [ WHILE QUESTION IF IDENT CALL BEGIN BANG ]
+##
+## The known suffix of the stack is as follows:
+## PROCEDURE
+##
+
+Illegal token in [procedure] declaration. Expected <ident>.
+
+program: PROCEDURE IDENT WHILE
+##
+## Ends in an error in state: 21.
+##
+## proc_decl -> PROCEDURE m(IDENT) . SEMICOLON block SEMICOLON proc_decl [ WHILE QUESTION IF IDENT CALL BEGIN BANG ]
+##
+## The known suffix of the stack is as follows:
+## PROCEDURE m(IDENT)
+##
+program: PROCEDURE IDENT SEMICOLON BANG IDENT WHILE
+##
+## Ends in an error in state: 23.
+##
+## proc_decl -> PROCEDURE m(IDENT) SEMICOLON block . SEMICOLON proc_decl [ WHILE QUESTION IF IDENT CALL BEGIN BANG ]
+##
+## The known suffix of the stack is as follows:
+## PROCEDURE m(IDENT) SEMICOLON block
+##
+
+Illegal token in [procedure] declaration. Expected [;].
+
+program: PROCEDURE IDENT SEMICOLON WALRUS
+##
+## Ends in an error in state: 22.
+##
+## proc_decl -> PROCEDURE m(IDENT) SEMICOLON . block SEMICOLON proc_decl [ WHILE QUESTION IF IDENT CALL BEGIN BANG ]
+##
+## The known suffix of the stack is as follows:
+## PROCEDURE m(IDENT) SEMICOLON
+##
+
+Illegal sort in [procedure] declaration. Expected a block.
+
+program: PROCEDURE IDENT SEMICOLON BANG IDENT SEMICOLON WALRUS
+##
+## Ends in an error in state: 24.
+##
+## proc_decl -> PROCEDURE m(IDENT) SEMICOLON block SEMICOLON . proc_decl [ WHILE QUESTION IF IDENT CALL BEGIN BANG ]
+##
+## The known suffix of the stack is as follows:
+## PROCEDURE m(IDENT) SEMICOLON block SEMICOLON
+##
+
+Illegal token after [procedure] declaration.
+
+program: WHILE WHILE
+##
+## Ends in an error in state: 27.
+##
+## stmt -> WHILE . cond DO stmt [ SEMICOLON END DOT ]
+##
+## The known suffix of the stack is as follows:
+## WHILE
+##
+
+Illegal sort in [while] statement. Expected a condition.
+
+program: IF ODD WHILE
+##
+## Ends in an error in state: 29.
+##
+## cond -> ODD . m(expr) [ THEN RPAREN DO ]
+##
+## The known suffix of the stack is as follows:
+## ODD
+##
+
+Illegal sort in [if] statement. Expected a condition.
+
+program: BANG LPAREN WHILE
+##
+## Ends in an error in state: 32.
+##
+## factor -> LPAREN . expr RPAREN [ THEN STAR SLASH SEMICOLON RPAREN PLUS NEQ MINUS LT LEQ GT GEQ EQ END DOT DO ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN
+##
+
+Illegal sort after [(]. Expected an expression.
+
+program: IF MINUS WHILE
+##
+## Ends in an error in state: 33.
+##
+## expr -> unary_op . m(term) [ THEN SEMICOLON RPAREN PLUS NEQ MINUS LT LEQ GT GEQ EQ END DOT DO ]
+##
+## The known suffix of the stack is as follows:
+## unary_op
+##
+
+Illegal token in [if] statement. Expected [then].
+
+program: IF MINUS IDENT WHILE
+##
+## Ends in an error in state: 35.
+##
+## expr -> unary_op m(term) . [ THEN SEMICOLON RPAREN PLUS NEQ MINUS LT LEQ GT GEQ EQ END DOT DO ]
+## term -> m(term) . mult_op m(factor) [ THEN STAR SLASH SEMICOLON RPAREN PLUS NEQ MINUS LT LEQ GT GEQ EQ END DOT DO ]
+##
+## The known suffix of the stack is as follows:
+## unary_op m(term)
+##
+program: IF IDENT SLASH WHILE
+##
+## Ends in an error in state: 38.
+##
+## term -> m(term) mult_op . m(factor) [ THEN STAR SLASH SEMICOLON RPAREN PLUS NEQ MINUS LT LEQ GT GEQ EQ END DOT DO ]
+##
+## The known suffix of the stack is as follows:
+## m(term) mult_op
+##
+program: IF IDENT WHILE
+##
+## Ends in an error in state: 43.
+##
+## expr -> term . [ THEN SEMICOLON RPAREN PLUS NEQ MINUS LT LEQ GT GEQ EQ END DOT DO ]
+## m(term) -> term . [ STAR SLASH ]
+##
+## The known suffix of the stack is as follows:
+## term
+##
+program: IF IDENT MINUS WHILE
+##
+## Ends in an error in state: 48.
+##
+## expr -> m(expr) add_op . m(term) [ THEN SEMICOLON RPAREN PLUS NEQ MINUS LT LEQ GT GEQ EQ END DOT DO ]
+##
+## The known suffix of the stack is as follows:
+## m(expr) add_op
+##
+program: IF IDENT MINUS IDENT WHILE
+##
+## Ends in an error in state: 49.
+##
+## expr -> m(expr) add_op m(term) . [ THEN SEMICOLON RPAREN PLUS NEQ MINUS LT LEQ GT GEQ EQ END DOT DO ]
+## term -> m(term) . mult_op m(factor) [ THEN STAR SLASH SEMICOLON RPAREN PLUS NEQ MINUS LT LEQ GT GEQ EQ END DOT DO ]
+##
+## The known suffix of the stack is as follows:
+## m(expr) add_op m(term)
+##
+
+Illegal sort in [if] statement. Expected a condition.
+
+program: BANG LPAREN IDENT THEN
+##
+## Ends in an error in state: 50.
+##
+## factor -> LPAREN expr . RPAREN [ THEN STAR SLASH SEMICOLON RPAREN PLUS NEQ MINUS LT LEQ GT GEQ EQ END DOT DO ]
+## m(expr) -> expr . [ PLUS MINUS ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN expr
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expr -> term
+##
+
+Illegal sort after [(]. Expected an expression.
+
+program: IF ODD IDENT SEMICOLON
+##
+## Ends in an error in state: 52.
+##
+## cond -> ODD m(expr) . [ THEN RPAREN DO ]
+## expr -> m(expr) . add_op m(term) [ THEN RPAREN PLUS MINUS DO ]
+##
+## The known suffix of the stack is as follows:
+## ODD m(expr)
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expr -> term
+## In state 53, spurious reduction of production m(expr) -> expr
+##
+
+Illegal token in [if] statement. Expected [then].
+
+program: IF NOT WHILE
+##
+## Ends in an error in state: 54.
+##
+## cond -> NOT . LPAREN cond RPAREN [ THEN RPAREN DO ]
+##
+## The known suffix of the stack is as follows:
+## NOT
+##
+
+Illegal token after [not]. Expected [(].
+
+program: IF NOT LPAREN WHILE
+##
+## Ends in an error in state: 55.
+##
+## cond -> NOT LPAREN . cond RPAREN [ THEN RPAREN DO ]
+##
+## The known suffix of the stack is as follows:
+## NOT LPAREN
+##
+
+Illegal sort after [(]. Expected a condition.
+
+program: IF IDENT THEN
+##
+## Ends in an error in state: 56.
+##
+## cond -> m(expr) . rel m(expr) [ THEN RPAREN DO ]
+## expr -> m(expr) . add_op m(term) [ PLUS NEQ MINUS LT LEQ GT GEQ EQ ]
+##
+## The known suffix of the stack is as follows:
+## m(expr)
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expr -> term
+## In state 53, spurious reduction of production m(expr) -> expr
+##
+
+Illegal sort in [if] statement. Expected a condition.
+
+program: IF IDENT EQ WHILE
+##
+## Ends in an error in state: 63.
+##
+## cond -> m(expr) rel . m(expr) [ THEN RPAREN DO ]
+##
+## The known suffix of the stack is as follows:
+## m(expr) rel
+##
+
+Illegal sort in [if] statement. Expected a condition.
+
+program: IF IDENT EQ IDENT SEMICOLON
+##
+## Ends in an error in state: 64.
+##
+## cond -> m(expr) rel m(expr) . [ THEN RPAREN DO ]
+## expr -> m(expr) . add_op m(term) [ THEN RPAREN PLUS MINUS DO ]
+##
+## The known suffix of the stack is as follows:
+## m(expr) rel m(expr)
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expr -> term
+## In state 53, spurious reduction of production m(expr) -> expr
+##
+
+Illegal sort in [if] statement. Expected a condition.
+
+program: IF NOT LPAREN ODD IDENT THEN
+##
+## Ends in an error in state: 65.
+##
+## cond -> NOT LPAREN cond . RPAREN [ THEN RPAREN DO ]
+##
+## The known suffix of the stack is as follows:
+## NOT LPAREN cond
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expr -> term
+## In state 53, spurious reduction of production m(expr) -> expr
+## In state 52, spurious reduction of production cond -> ODD m(expr)
+##
+
+Illegal token in [not] condition. Expected [)].
+
+program: WHILE ODD IDENT THEN
+##
+## Ends in an error in state: 67.
+##
+## stmt -> WHILE cond . DO stmt [ SEMICOLON END DOT ]
+##
+## The known suffix of the stack is as follows:
+## WHILE cond
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expr -> term
+## In state 53, spurious reduction of production m(expr) -> expr
+## In state 52, spurious reduction of production cond -> ODD m(expr)
+##
+
+Illegal token in [while] statement. Expected [do].
+
+program: WHILE ODD IDENT DO WALRUS
+##
+## Ends in an error in state: 68.
+##
+## stmt -> WHILE cond DO . stmt [ SEMICOLON END DOT ]
+##
+## The known suffix of the stack is as follows:
+## WHILE cond DO
+##
+
+Illegal sort in [while] statement. Expected a statement.
+
+program: QUESTION WHILE
+##
+## Ends in an error in state: 69.
+##
+## stmt -> QUESTION . m(IDENT) [ SEMICOLON END DOT ]
+##
+## The known suffix of the stack is as follows:
+## QUESTION
+##
+
+Illegal token in [?] statement. Expected an <ident>.
+
+program: IF WHILE
+##
+## Ends in an error in state: 71.
+##
+## stmt -> IF . cond THEN stmt [ SEMICOLON END DOT ]
+##
+## The known suffix of the stack is as follows:
+## IF
+##
+
+Illegal sort in [if] statement. Expected a condition.
+
+program: IF ODD IDENT RPAREN
+##
+## Ends in an error in state: 72.
+##
+## stmt -> IF cond . THEN stmt [ SEMICOLON END DOT ]
+##
+## The known suffix of the stack is as follows:
+## IF cond
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expr -> term
+## In state 53, spurious reduction of production m(expr) -> expr
+## In state 52, spurious reduction of production cond -> ODD m(expr)
+##
+
+Illegal token in [if] statement. Expected [then].
+
+program: IF ODD IDENT THEN WALRUS
+##
+## Ends in an error in state: 73.
+##
+## stmt -> IF cond THEN . stmt [ SEMICOLON END DOT ]
+##
+## The known suffix of the stack is as follows:
+## IF cond THEN
+##
+
+Illegal sort in [if] statement. Expected a statement.
+
+program: CALL WHILE
+##
+## Ends in an error in state: 74.
+##
+## stmt -> CALL . m(IDENT) [ SEMICOLON END DOT ]
+##
+## The known suffix of the stack is as follows:
+## CALL
+##
+
+Illegal token in [call] statement. Expected an <ident>.
+
+program: BEGIN WALRUS
+##
+## Ends in an error in state: 76.
+##
+## stmt -> BEGIN . END [ SEMICOLON END DOT ]
+## stmt -> BEGIN . stmt_list END [ SEMICOLON END DOT ]
+##
+## The known suffix of the stack is as follows:
+## BEGIN
+##
+
+Illegal token after [begin].
+
+program: BANG WHILE
+##
+## Ends in an error in state: 78.
+##
+## stmt -> BANG . m(factor) [ SEMICOLON END DOT ]
+##
+## The known suffix of the stack is as follows:
+## BANG
+##
+
+Illegal sort in [!] statement. Expected an expression.
+
+program: BEGIN BANG IDENT WHILE
+##
+## Ends in an error in state: 82.
+##
+## stmt_list -> stmt . SEMICOLON stmt_list [ END ]
+## stmt_list -> stmt . [ END ]
+##
+## The known suffix of the stack is as follows:
+## stmt
+##
+
+Illegal token after statement. Expected [;] or [end].
+
+program: BEGIN BANG IDENT SEMICOLON WALRUS
+##
+## Ends in an error in state: 83.
+##
+## stmt_list -> stmt SEMICOLON . stmt_list [ END ]
+##
+## The known suffix of the stack is as follows:
+## stmt SEMICOLON
+##
+
+Illegal token after [;].
+
+program: IDENT WHILE
+##
+## Ends in an error in state: 85.
+##
+## stmt -> m(IDENT) . WALRUS m(expr) [ SEMICOLON END DOT ]
+##
+## The known suffix of the stack is as follows:
+## m(IDENT)
+##
+
+Illegal token after <ident>. Expected [:=].
+
+program: IDENT WALRUS WHILE
+##
+## Ends in an error in state: 86.
+##
+## stmt -> m(IDENT) WALRUS . m(expr) [ SEMICOLON END DOT ]
+##
+## The known suffix of the stack is as follows:
+## m(IDENT) WALRUS
+##
+
+Illegal sort after [:=]. Expected an expression.
+
+program: IDENT WALRUS IDENT THEN
+##
+## Ends in an error in state: 87.
+##
+## expr -> m(expr) . add_op m(term) [ SEMICOLON PLUS MINUS END DOT ]
+## stmt -> m(IDENT) WALRUS m(expr) . [ SEMICOLON END DOT ]
+##
+## The known suffix of the stack is as follows:
+## m(IDENT) WALRUS m(expr)
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 43, spurious reduction of production expr -> term
+## In state 53, spurious reduction of production m(expr) -> expr
+##
+
+Illegal token after <ident>.
+
+program: BANG IDENT WHILE
+##
+## Ends in an error in state: 91.
+##
+## program -> block . DOT EOF [ # ]
+##
+## The known suffix of the stack is as follows:
+## block
+##
+
+A top-level statement must be terminated by a [.].
+
+program: BANG IDENT DOT WHILE
+##
+## Ends in an error in state: 92.
+##
+## program -> block DOT . EOF [ # ]
+##
+## The known suffix of the stack is as follows:
+## block DOT
+##
+
+A top-level [.] should end the program.
+
