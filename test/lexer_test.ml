@@ -36,20 +36,18 @@ let%expect_test "correctly handles comments" =
     [%expect {| begin end . EOF |}])
 ;;
 
-(* FIXME: the source location in the error is wrong *)
 let%expect_test "reports an error on unterminated comments" =
   In_channel.with_file "../examples/lex_comments1.pl0" ~f:(fun fin ->
     let lexbuf = Lexing.from_channel fin in
     lex lexbuf;
-    [%expect {| [3:30-3:30]: Unterminated comment. |}])
+    [%expect {| [1:1-3:0]: Unterminated comment. |}])
 ;;
 
-(* FIXME: the source location in the error is wrong *)
 let%expect_test "reports an error on unterminated nested comments" =
   In_channel.with_file "../examples/lex_comments2.pl0" ~f:(fun fin ->
     let lexbuf = Lexing.from_channel fin in
     lex lexbuf;
-    [%expect {| [7:50-7:50]: Unterminated comment. |}])
+    [%expect {| [1:1-7:0]: Unterminated comment. |}])
 ;;
 
 let%expect_test "reports an error on integers that are too large" =
@@ -63,7 +61,7 @@ let%expect_test "reports an error on integers that are too large" =
       |}])
 ;;
 
-let%expect_test "correctly ignores whitespoce" =
+let%expect_test "correctly ignores whitespace" =
   In_channel.with_file "../examples/lex_whitespace.pl0" ~f:(fun fin ->
     let lexbuf = Lexing.from_channel fin in
     lex lexbuf;
