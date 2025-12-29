@@ -1,0 +1,14 @@
+var x;
+begin;
+  x := 10;
+  if ! odd x then
+  begin
+    if x =/= 10 then
+      !(x + 1); { should not print 11 }
+    if x < 10 then
+      !(x + 2); { should not print 12 }
+    if x >= 10 then
+      !x { should print 10}
+  end
+end.
+

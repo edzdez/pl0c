@@ -1,0 +1,19 @@
+{ procedures can be nested }
+var x;
+procedure outer;
+var y;
+  procedure inner;
+  begin
+    x := x + 1;
+    y := y + 1
+  end;
+begin
+  y := 0;
+  call inner;
+  !y { should output 1 }
+end;
+begin
+  x := 0;
+  call outer;
+  !x { should output 1 }
+end.

@@ -1,0 +1,7 @@
+{ only declarations can appear before the final statement }
+const a = 10;
+var x, y;
+x := 1; { illegal statement }
+procedure p;
+begin end;
+begin end.

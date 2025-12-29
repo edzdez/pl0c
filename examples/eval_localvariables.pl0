@@ -1,0 +1,12 @@
+var x;
+procedure p;
+var x;
+begin
+  x := 5;
+  !x { should output 5 }
+end;
+begin
+  x := 1;
+  call p;
+  !x { should output 1 }
+end.

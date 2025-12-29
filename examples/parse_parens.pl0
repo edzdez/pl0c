@@ -1,0 +1,5 @@
+var x;
+begin
+  x := (2 + 3) * 4;
+  !x { expect 20 }
+end.

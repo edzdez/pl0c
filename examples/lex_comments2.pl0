@@ -1,0 +1,6 @@
+{
+  unclosed
+  {
+    nested comments
+}
+begin end.

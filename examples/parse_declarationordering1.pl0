@@ -1,0 +1,11 @@
+{ a valid PL/0 program }
+const a = 1;
+var x;
+procedure p;
+begin
+  x := a
+end;
+begin
+  call p;
+  !x
+end.

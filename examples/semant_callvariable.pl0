@@ -1,0 +1,4 @@
+var x;
+begin
+  call x { calling a variable is meaningless }
+end

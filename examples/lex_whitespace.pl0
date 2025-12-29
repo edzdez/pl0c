@@ -1,0 +1,14 @@
+{ whitespace is not significant! }
+
+const   a=10   ,   b =20;
+
+
+
+
+
+var   x  ,y;
+begin
+      x    := a  +b;
+  y:=x* 2;
+!    y
+  end.

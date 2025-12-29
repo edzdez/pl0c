@@ -1,0 +1,4 @@
+{ const cannot appear after var }
+var x;
+const a = 1; { illegal const declaration }
+begin end.

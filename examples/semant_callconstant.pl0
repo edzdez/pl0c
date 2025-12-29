@@ -1,0 +1,4 @@
+const x = 0;
+begin
+  call x { calling a constant is meaningless }
+end

@@ -1,0 +1,4 @@
+{ declarations cannot appear after begin }
+begin end;
+procedure p. { illegal procedure declaration }
+

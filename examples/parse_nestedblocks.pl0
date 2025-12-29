@@ -1,0 +1,9 @@
+var x;
+begin
+  begin
+    begin
+      x := 1
+    end
+  end;
+  !x
+end.

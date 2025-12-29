@@ -1,0 +1,11 @@
+var x;
+procedure inc;
+begin
+  x := x + 1
+end;
+begin
+  x := 0;
+  call inc;
+  call inc;
+  !x { should output 2 }
+end.

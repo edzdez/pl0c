@@ -1,0 +1,5 @@
+{ var cannot appear after procedure }
+procedure p;
+begin end;
+var x; { illegal var declaration }
+begin end.

@@ -1,0 +1,6 @@
+{ declaration ordering rules should be enforced inside nested blocks }
+procedure p;
+var x;
+const a = 1; { illegal const declaration }
+begin end;
+begin end.

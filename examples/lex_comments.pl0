@@ -1,0 +1,9 @@
+{ comments at the top! }
+{
+  multiline
+  comments!
+}
+begin { inline comments }
+  { and { nested } comments! }
+end.
+{ final comments }

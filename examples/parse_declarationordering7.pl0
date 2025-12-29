@@ -1,0 +1,5 @@
+{ procedures cannot be declared inside begin ... end statements }
+begin
+  procedure p; { illegal procedure declaration }
+  begin end;
+end.
