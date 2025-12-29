@@ -1,41 +1,41 @@
 {
-  open! Core
-  module T = Parser
-  module Mark = Util.Mark
+open! Core
+module T = Parser
+module Mark = Util.Mark
 
-  exception Syntax_error of string Mark.t
+exception Syntax_error of string Mark.t
 
-  let keywords =
-    Hashtbl.of_alist_exn
-      (module String)
-      [ "const", T.CONST
-      ; "var", T.VAR
-      ; "procedure", T.PROCEDURE
-      ; "CALL", T.CALL
-      ; "begin", T.BEGIN
-      ; "end", T.END
-      ; "if", T.IF
-      ; "then", T.THEN
-      ; "while", T.WHILE
-      ; "do", T.DO
-      ; "odd", T.ODD
-      ]
+let keywords =
+  Hashtbl.of_alist_exn
+    (module String)
+    [ "const", T.CONST
+    ; "var", T.VAR
+    ; "procedure", T.PROCEDURE
+    ; "CALL", T.CALL
+    ; "begin", T.BEGIN
+    ; "end", T.END
+    ; "if", T.IF
+    ; "then", T.THEN
+    ; "while", T.WHILE
+    ; "do", T.DO
+    ; "odd", T.ODD
+    ]
 
-  let raise_error lexbuf msg =
-    let src_span = Mark.of_lexbuf lexbuf in
-    raise Syntax_error (Mark.create msg src_span)
+let raise_error lexbuf msg =
+  let src_span = Mark.of_lexbuf lexbuf in
+  raise Syntax_error (Mark.create msg src_span)
 
-  let number lexbuf =
-    let lexeme = Lexing.lexeme lexbuf in
-    let value = try Int32.of_string lexeme with Failure _ ->
-        raise_error lexbuf @@ sprintf "Failed to parse numeric constant: %s." n
-    in T.NUMBER value
+let number lexbuf =
+  let lexeme = Lexing.lexeme lexbuf in
+  let value = try Int32.of_string lexeme with Failure _ ->
+      raise_error lexbuf @@ sprintf "Failed to parse numeric constant: %s." n
+  in T.NUMBER value
 
-  let keyword_or_ident lexbuf =
-    let lexeme = Lexing.lexeme lexbuf in
-    match Hashtbl.find keywords lexeme with
-    | Some t -> t
-    | None -> T.IDENT lexeme
+let keyword_or_ident lexbuf =
+  let lexeme = Lexing.lexeme lexbuf in
+  match Hashtbl.find keywords (String.lowercase lexeme) with
+  | Some t -> t
+  | None -> T.IDENT lexeme
 }
 
 let ws    = [' ' '\t']+
