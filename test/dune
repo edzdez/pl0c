@@ -1,0 +1,10 @@
+(include_subdirs unqualified)
+
+(library
+ (name pl0c_test)
+ (libraries core parse)
+ (preprocess
+  (pps ppx_jane))
+ (inline_tests
+  (deps
+   (source_tree ../examples))))

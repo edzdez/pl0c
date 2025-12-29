@@ -2,7 +2,7 @@
 
 (menhir
  (modules parser)
- (flags --exn-carries-state))
+ (flags --exn-carries-state --external-tokens Token))
 
 (library
  (name parse)

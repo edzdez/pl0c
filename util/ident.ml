@@ -23,3 +23,4 @@ let add value =
 ;;
 
 let get key = Hashtbl.find by_id key
+let get_exn key = Hashtbl.find_exn by_id key

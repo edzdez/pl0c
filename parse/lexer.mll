@@ -1,6 +1,6 @@
 {
 open! Core
-module T = Parser
+module T = Token
 module Mark = Util.Mark
 module Ident = Util.Ident
 
@@ -12,7 +12,7 @@ let keywords =
     [ "const", T.CONST
     ; "var", T.VAR
     ; "procedure", T.PROCEDURE
-    ; "CALL", T.CALL
+    ; "call", T.CALL
     ; "begin", T.BEGIN
     ; "end", T.END
     ; "if", T.IF
@@ -50,7 +50,7 @@ let ident = alpha (alpha | digit)*
 
 rule read =
   parse
-  | ws+           { read lexbuf }
+  | ws            { read lexbuf }
   | nl            { Lexing.new_line lexbuf; read lexbuf}
 
   | '('           { T.LPAREN }

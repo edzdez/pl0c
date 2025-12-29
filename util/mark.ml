@@ -14,10 +14,6 @@ let of_position ({ pos_fname; pos_lnum; pos_cnum; _ } : Lexing.position) =
   }
 ;;
 
-let to_string { filename; line_no; col_no } =
-  sprintf "%s%d:%d" (Option.value ~default:"" filename) line_no col_no
-;;
-
 type src_span =
   { begin_loc : src_loc
   ; end_loc : src_loc
@@ -32,6 +28,17 @@ let of_lexbuf lexbuf =
   { begin_loc = of_position @@ Lexing.lexeme_start_p lexbuf
   ; end_loc = of_position @@ Lexing.lexeme_end_p lexbuf
   }
+;;
+
+let to_string { begin_loc; end_loc } =
+  (* assume the filename is the same *)
+  sprintf
+    "%s%d:%d-%d:%d"
+    (Option.value ~default:"" begin_loc.filename)
+    begin_loc.line_no
+    begin_loc.col_no
+    end_loc.line_no
+    end_loc.col_no
 ;;
 
 type 'a t =

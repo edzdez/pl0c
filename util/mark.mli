@@ -13,7 +13,6 @@ type src_loc =
 [@@deriving sexp]
 
 val of_position : Lexing.position -> src_loc
-val to_string : src_loc -> string
 
 type src_span =
   { begin_loc : src_loc
@@ -23,6 +22,7 @@ type src_span =
 
 val of_positions : Lexing.position -> Lexing.position -> src_span
 val of_lexbuf : Lexing.lexbuf -> src_span
+val to_string : src_span -> string
 
 type 'a t =
   { data : 'a
