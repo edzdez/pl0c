@@ -1,0 +1,11 @@
+(ocamllex lexer)
+
+(menhir
+ (modules parser)
+ (flags --exn-carries-state))
+
+(library
+ (name parse)
+ (libraries core ast util)
+ (preprocess
+  (pps ppx_jane)))
