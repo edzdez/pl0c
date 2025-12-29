@@ -1,0 +1,15 @@
+(**
+ * A global symbol table that stores identifiers.
+ *)
+
+open! Core
+
+type t [@@deriving sexp]
+
+(** Add an identifier to the symbol table.
+    If this identifier already exists, then return the corresponding identifier id. *)
+val add : string -> t
+
+(** Find the identifier in the symbol table with the given id.
+    If no such identifier exists, returns [None]. *)
+val get : t -> string option

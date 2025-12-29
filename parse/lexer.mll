@@ -2,6 +2,7 @@
 open! Core
 module T = Parser
 module Mark = Util.Mark
+module Ident = Util.Ident
 
 exception Syntax_error of string Mark.t
 
@@ -35,7 +36,7 @@ let keyword_or_ident lexbuf =
   let lexeme = Lexing.lexeme lexbuf in
   match Hashtbl.find keywords (String.lowercase lexeme) with
   | Some t -> t
-  | None -> T.IDENT lexeme
+  | None -> T.IDENT (Ident.add lexeme)
 }
 
 let ws    = [' ' '\t']+

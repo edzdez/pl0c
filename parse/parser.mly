@@ -1,5 +1,5 @@
 %token <string> IDENT
-%token <int> NUMBER
+%token <Util.Ident.t> NUMBER
 
 %token CONST
 %token VAR
