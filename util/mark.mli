@@ -21,6 +21,7 @@ type src_span =
   }
 [@@deriving sexp]
 
+val of_positions : Lexing.position -> Lexing.position -> src_span
 val of_lexbuf : Lexing.lexbuf -> src_span
 
 type 'a t =

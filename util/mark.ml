@@ -24,6 +24,10 @@ type src_span =
   }
 [@@deriving sexp]
 
+let of_positions begin_loc end_loc =
+  { begin_loc = of_position begin_loc; end_loc = of_position end_loc }
+;;
+
 let of_lexbuf lexbuf =
   { begin_loc = of_position @@ Lexing.lexeme_start_p lexbuf
   ; end_loc = of_position @@ Lexing.lexeme_end_p lexbuf

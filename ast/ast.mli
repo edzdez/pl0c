@@ -8,29 +8,31 @@ open! Core
 module Mark = Util.Mark
 module Ident = Util.Ident
 
+type mident = Ident.t Mark.t
+
 type block =
-  { const_decl : const_decl list Mark.t
-  ; var_decl : var_decl list Mark.t
-  ; proc_decl : proc_decl list Mark.t
-  ; stmt : stmt Mark.t
+  { const_decl : const_decl list
+  ; var_decl : var_decl list
+  ; proc_decl : proc_decl list
+  ; stmt : stmt
   }
 
-and const_decl = (Ident.t * Int32.t) Mark.t
-and var_decl = Ident.t Mark.t
-and proc_decl = (Ident.t * block) Mark.t
+and const_decl = mident * Int32.t
+and var_decl = mident
+and proc_decl = mident * block
 
 and stmt =
-  | Assign of (Ident.t * expr) Mark.t
-  | Call of Ident.t Mark.t
-  | Scope of stmt list Mark.t
-  | If of (cond * stmt) Mark.t
-  | While of (cond * stmt) Mark.t
-  | Read of Ident.t Mark.t
-  | Write of expr Mark.t
+  | Assign of mident * mexpr
+  | Call of mident
+  | Scope of stmt list
+  | If of (cond * stmt)
+  | While of (cond * stmt)
+  | Read of mident
+  | Write of mexpr
 
 and cond =
-  | Odd of expr Mark.t
-  | Rel of (rel * expr * expr) Mark.t
+  | Odd of mexpr
+  | Rel of (rel * mexpr * mexpr)
 
 and rel =
   | Eq
@@ -41,14 +43,16 @@ and rel =
   | Geq
 
 and expr =
-  | Unary of (un_op * expr) Mark.t
-  | Binary of (bin_op * expr * expr) Mark.t
-  | Num of int Mark.t
-  | Id of Ident.t Mark.t
+  | Unary of (un_op * mexpr)
+  | Binary of (bin_op * mexpr * mexpr)
+  | Num of Int32.t
+  | Id of mident
+
+and mexpr = expr Mark.t
 
 and un_op =
-  | Plus
-  | Minus
+  | UnPlus
+  | UnMinus
 
 and bin_op =
   | Plus

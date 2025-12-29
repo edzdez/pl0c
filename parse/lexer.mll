@@ -24,12 +24,12 @@ let keywords =
 
 let raise_error lexbuf msg =
   let src_span = Mark.of_lexbuf lexbuf in
-  raise Syntax_error (Mark.create msg src_span)
+  raise (Syntax_error (Mark.create msg src_span))
 
 let number lexbuf =
   let lexeme = Lexing.lexeme lexbuf in
   let value = try Int32.of_string lexeme with Failure _ ->
-      raise_error lexbuf @@ sprintf "Failed to parse numeric constant: %s." n
+      raise_error lexbuf @@ sprintf "Failed to parse numeric constant: %s." lexeme
   in T.NUMBER value
 
 let keyword_or_ident lexbuf =
