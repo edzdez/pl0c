@@ -1,4 +1,5 @@
 (lang dune 3.20)
+(using menhir 3.0)
 
 (name pl0c)
 
@@ -15,5 +16,5 @@
 (package
  (name pl0c)
  (synopsis "A compiler for the PL/0 language")
- (depends ocaml))
+ (depends ocaml core menhir))
 

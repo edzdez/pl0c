@@ -9,6 +9,8 @@ bug-reports: "https://github.com/edzdez/pl0c/issues"
 depends: [
   "dune" {>= "3.20"}
   "ocaml"
+  "core"
+  "menhir"
   "odoc" {with-doc}
 ]
 build: [
