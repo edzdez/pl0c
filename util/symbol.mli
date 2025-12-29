@@ -4,12 +4,12 @@
 
 open! Core
 
-type symbol [@@deriving sexp]
+type t [@@deriving sexp]
 
 type entry =
   { name : string
   ; kind : kind
-  ; owner : symbol option
+  ; owner : t option
   ; value : Int32.t option
   }
 
@@ -20,12 +20,12 @@ and kind =
 [@@deriving sexp]
 
 (** Add an entry to the symbol table. *)
-val add : entry -> symbol
+val add : entry -> t
 
 (** Find the entry in the symbol table with the given id.
     If no such entry exists, returns [None]. *)
-val get : symbol -> entry option
+val get : t -> entry option
 
 (** Find the entry in the symbol table with the given id.
     Throws an error if no such entry exists. *)
-val get_exn : symbol -> entry
+val get_exn : t -> entry

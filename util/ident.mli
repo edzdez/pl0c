@@ -4,7 +4,9 @@
 
 open! Core
 
-type t [@@deriving sexp]
+type t [@@deriving sexp, compare, equal]
+
+include Comparator.S with type t := t
 
 (** Add an identifier to the symbol table.
     If this identifier already exists, then return the corresponding identifier id. *)
