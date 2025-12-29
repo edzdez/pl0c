@@ -1,7 +1,7 @@
 var x;
-begin;
+begin
   x := 10;
-  if ! odd x then
+  if not (odd x) then
   begin
     if x =/= 10 then
       !(x + 1); { should not print 11 }
