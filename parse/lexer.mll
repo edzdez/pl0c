@@ -20,6 +20,7 @@ let keywords =
     ; "while", T.WHILE
     ; "do", T.DO
     ; "odd", T.ODD
+    ; "not", T.NOT
     ]
 
 let raise_error lexbuf msg =
@@ -79,18 +80,19 @@ rule read =
   | num           { number lexbuf }
   | ident         { keyword_or_ident lexbuf }
 
-  | '{'           { consume_comment 0 lexbuf }
+  | '{'           { consume_comment lexbuf.lex_curr_p 0 lexbuf }
   | eof           { T.EOF }
   | _             { raise_error lexbuf
                     @@ sprintf "Unexpected character: %s." (Lexing.lexeme lexbuf) }
 
-and consume_comment nesting =
+and consume_comment start_loc nesting =
   parse
-  | nl            { Lexing.new_line lexbuf; consume_comment nesting lexbuf }
-  | '{'           { consume_comment (nesting + 1) lexbuf }
+  | nl            { Lexing.new_line lexbuf; consume_comment start_loc nesting lexbuf }
+  | '{'           { consume_comment start_loc (nesting + 1) lexbuf }
   | '}'           { if nesting = 0 then
                       read lexbuf
-                    else consume_comment (nesting - 1) lexbuf }
-  | eof           { raise_error lexbuf "Unterminated comment." }
-  | _             { consume_comment nesting lexbuf }
+                    else consume_comment start_loc (nesting - 1) lexbuf }
+  | eof           { lexbuf.lex_start_p <- start_loc;
+                    raise_error lexbuf "Unterminated comment." }
+  | _             { consume_comment start_loc nesting lexbuf }
 

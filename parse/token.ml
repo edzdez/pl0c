@@ -15,6 +15,7 @@ type token =
   | PLUS
   | ODD
   | NUMBER of Int32.t
+  | NOT
   | NEQ
   | MINUS
   | LT
@@ -50,6 +51,7 @@ let to_string token =
   | PLUS -> "+"
   | ODD -> "odd"
   | NUMBER n -> sprintf "num[%ld]" n
+  | NOT -> "not"
   | NEQ -> "=/="
   | MINUS -> "-"
   | LT -> "<"

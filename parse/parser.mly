@@ -21,6 +21,7 @@
 %token WHILE
 %token DO
 
+%token NOT
 %token ODD
 
 %token LPAREN
@@ -47,7 +48,7 @@
 program:
   | EOF
     { None }
-  | b = block; DOT
+  | b = block; DOT; EOF
     { Some b }
   ;
 
@@ -89,7 +90,7 @@ ident_list:
   ;
 
 proc_decl:
-  | PROCEDURE; p = m(IDENT); b = block; SEMICOLON; ps = proc_decl
+  | PROCEDURE; p = m(IDENT); SEMICOLON; b = block; SEMICOLON; ps = proc_decl
     { (p, b) :: ps }
   | { [] }
   ;
@@ -99,6 +100,8 @@ stmt:
     { Ast.Assign (x, e) }
   | CALL; p = m(IDENT)
     { Ast.Call p }
+  | BEGIN; END
+    { Ast.Scope [] }
   | BEGIN; l = stmt_list; END
     { Ast.Scope l }
   | IF; c = cond; THEN; s = stmt
@@ -107,19 +110,22 @@ stmt:
     { Ast.While (c, s) }
   | QUESTION; x = m(IDENT)
     { Ast.Read x }
-  | BANG; e = m(expr)
+  | BANG; e = m(factor)
     { Ast.Write e }
   ;
 
 stmt_list:
   | s = stmt; SEMICOLON; ss = stmt_list
     { s :: ss }
-  | { [] }
+  | s = stmt
+    { [s] }
   ;
 
 cond:
   | ODD; e = m(expr)
     { Ast.Odd e }
+  | NOT; LPAREN; e = cond; RPAREN
+    { Ast.Not e }
   | l = m(expr); op = rel; r = m(expr)
     { Rel (op, l, r) }
 

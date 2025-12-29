@@ -32,6 +32,7 @@ and stmt =
 
 and cond =
   | Odd of mexpr
+  | Not of cond
   | Rel of (rel * mexpr * mexpr)
 
 and rel =
@@ -60,3 +61,5 @@ and bin_op =
   | Star
   | Slash
 [@@deriving sexp]
+
+val to_string : block -> string
