@@ -1,0 +1,4 @@
+(executable
+ (public_name pl0c)
+ (name pl0c)
+ (libraries pl0c))
