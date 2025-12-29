@@ -1,0 +1,25 @@
+module type Temp = sig
+  type t = int
+
+  (** Reset the internal state.
+      Note that subsequent calls to [fresh] may produce values that have been previously assigned. *)
+  val reset : unit -> unit
+
+  (** Generate a fresh temporary value *)
+  val fresh : unit -> t
+end
+
+module Make () = struct
+  type t = int
+
+  let counter = ref 0
+  let reset () = counter := 0
+
+  let fresh () =
+    let n = !counter in
+    counter := n + 1;
+    n
+  ;;
+end
+
+include Make ()
