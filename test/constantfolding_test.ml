@@ -135,10 +135,7 @@ let%expect_test "complex constant folding" =
       [%expect
         {|
         procedure sym$11;
-        begin
-        ;
-
-        end;
+        begin end;
         begin
           call sym$11;
           !(sym$10)

@@ -38,6 +38,12 @@ and eexpr =
 
 and meexpr = eexpr Mark.t
 
+let is_nop s =
+  match s with
+  | Nop -> true
+  | _ -> false
+;;
+
 let create_indent indent = String.init (2 * indent) ~f:(const ' ')
 
 let rec block_to_string ~indent { consts; vars; procs; stmt } =
@@ -80,6 +86,7 @@ and stmt_to_string ~indent s =
     sprintf "%s%s := %s" s_indent (Symbol.to_string x) (expr_to_string e.data)
   | Call p -> sprintf "%scall %s" s_indent (Symbol.to_string p)
   | Scope ss ->
+    let ss = List.filter ss ~f:(fun x -> not @@ is_nop x) in
     (match ss with
      | [] -> sprintf "%sbegin end" s_indent
      | _ ->
