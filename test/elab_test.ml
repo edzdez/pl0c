@@ -115,7 +115,7 @@ let%expect_test "properly supports variable shadowing" =
         const sym$9 = 1;
         begin
           !(sym$9)
-        end.;
+        end;
         begin
           !(sym$7)
         end.

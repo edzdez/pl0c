@@ -53,9 +53,9 @@ let%expect_test "parses programs with multiple procedures" =
       [%expect
         {|
         procedure p;
-        begin end.;
+        begin end;
         procedure q;
-        begin end.;
+        begin end;
         begin end.
         |}])
 ;;
@@ -97,7 +97,7 @@ let%expect_test "parses a program with valid declaration ordering" =
         procedure p;
         begin
           x := a
-        end.;
+        end;
         begin
           call p;
           !(x)
@@ -207,12 +207,12 @@ let%expect_test "procedures are allowed to be nested" =
         begin
           x := (x) + (1);
           y := (y) + (1)
-        end.;
+        end;
         begin
           y := 0;
           call inner;
           !(y)
-        end.;
+        end;
         begin
           x := 0;
           call outer;

@@ -42,7 +42,7 @@ let create_indent indent = String.init (2 * indent) ~f:(const ' ')
 
 let rec block_to_string ~indent { consts; vars; procs; stmt } =
   sprintf
-    "%s%s%s%s."
+    "%s%s%s%s"
     (consts_to_string ~indent consts)
     (vars_to_string ~indent vars)
     (procs_to_string ~indent procs)
@@ -150,4 +150,4 @@ and bin_op_to_string op =
   | Slash -> "/"
 ;;
 
-let to_string = block_to_string ~indent:0
+let to_string block = sprintf "%s." (block_to_string ~indent:0 block)
