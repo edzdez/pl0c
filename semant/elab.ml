@@ -5,29 +5,22 @@ module Ident = Util.Ident
 module Mark = Util.Mark
 
 type elab_error =
-  | Undeclared_ident of string Mark.t
-  | Duplicate_ident of string Mark.t
-  | Not_lvalue of string Mark.t
-  | Not_procedure of string Mark.t
+  | Undeclared_ident of string
+  | Duplicate_ident of string
+  | Not_lvalue of string
+  | Not_procedure of string
 [@@deriving sexp]
 
-exception Elab_error of elab_error
+exception Elab_error of elab_error Mark.t
 
-let raise_duplicate_ident ({ data; span } : Ast.mident) =
-  raise (Elab_error (Duplicate_ident (Mark.create (Ident.get_exn data) span)))
+let raise_error err ({ data; span } : Ast.mident) =
+  raise (Elab_error (Mark.create (err (Ident.get_exn data)) span))
 ;;
 
-let raise_undeclared_ident ({ data; span } : Ast.mident) =
-  raise (Elab_error (Undeclared_ident (Mark.create (Ident.get_exn data) span)))
-;;
-
-let raise_not_lvalue ({ data; span } : Ast.mident) =
-  raise (Elab_error (Not_lvalue (Mark.create (Ident.get_exn data) span)))
-;;
-
-let raise_not_proc ({ data; span } : Ast.mident) =
-  raise (Elab_error (Not_procedure (Mark.create (Ident.get_exn data) span)))
-;;
+let duplicate_ident x = Duplicate_ident x
+let undeclared_ident x = Undeclared_ident x
+let not_lvalue x = Not_lvalue x
+let not_procedure x = Not_procedure x
 
 module Env = struct
   type t = (Ident.t, sym) Hashtbl.t list
@@ -39,13 +32,13 @@ module Env = struct
     | [] -> failwith "cannot add a binding to an empty environment"
     | env :: _ ->
       (match Hashtbl.add env ~key:key.data ~data with
-       | `Duplicate -> raise_duplicate_ident key
+       | `Duplicate -> raise_error duplicate_ident key
        | `Ok -> t)
   ;;
 
   let find (t : t) key =
     let rec go = function
-      | [] -> raise_undeclared_ident key
+      | [] -> raise_error undeclared_ident key
       | hd :: tl ->
         (match Hashtbl.find hd key.data with
          | None -> go tl
@@ -119,14 +112,14 @@ and elab_lvalue ~env mident =
   let entry = Symbol.get_exn symb in
   match entry.kind with
   | Var -> symb
-  | _ -> raise_not_lvalue mident
+  | _ -> raise_error not_lvalue mident
 
 and elab_proc ~env mident =
   let symb = Env.find env mident in
   let entry = Symbol.get_exn symb in
   match entry.kind with
   | Proc -> symb
-  | _ -> raise_not_proc mident
+  | _ -> raise_error not_procedure mident
 
 and elab_cond ~env c =
   match c with

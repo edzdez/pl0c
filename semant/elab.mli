@@ -19,13 +19,13 @@ open! Core
 open East
 
 type elab_error =
-  | Undeclared_ident of string Mark.t
-  | Duplicate_ident of string Mark.t
-  | Not_lvalue of string Mark.t
-  | Not_procedure of string Mark.t
+  | Undeclared_ident of string
+  | Duplicate_ident of string
+  | Not_lvalue of string
+  | Not_procedure of string
 [@@deriving sexp]
 
-exception Elab_error of elab_error
+exception Elab_error of elab_error Mark.t
 
 (** Construct an elaborated AST from the original *)
 val elab : Ast.block -> eblock

@@ -6,3 +6,5 @@
  *  - Typechecking: check expression types.
  *  - Constant Folding: evaluate constant expressions at compile time.
  *)
+
+module Elab = Elab
