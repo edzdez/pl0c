@@ -6,6 +6,8 @@ open! Core
 
 type t [@@deriving sexp, compare, equal]
 
+val to_string : t -> string
+
 type entry =
   { name : string
   ; kind : kind

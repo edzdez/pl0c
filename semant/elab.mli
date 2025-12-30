@@ -29,3 +29,5 @@ exception Elab_error of elab_error Mark.t
 
 (** Construct an elaborated AST from the original *)
 val elab : Ast.block -> eblock
+
+val to_string : eblock -> string

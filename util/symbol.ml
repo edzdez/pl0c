@@ -2,6 +2,8 @@ open! Core
 
 type t = int [@@deriving sexp, compare, equal]
 
+let to_string t = sprintf "sym$%d" t
+
 type entry =
   { name : string
   ; kind : kind

@@ -1,7 +1,6 @@
 open! Core
 module P = Parse.Parser
 module L = Parse.Lexer
-module T = Parse.Token
 module M = Parse.Parser_messages
 module Mark = Util.Mark
 module Ident = Util.Ident

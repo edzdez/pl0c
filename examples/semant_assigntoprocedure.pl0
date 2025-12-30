@@ -2,4 +2,4 @@ procedure p;
 begin end;
 begin
   p := 10 { cannot assign to procedure }
-end
+end.
