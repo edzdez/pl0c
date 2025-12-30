@@ -1,0 +1,9 @@
+procedure A;
+var x;
+begin
+  x := 5
+end;
+begin
+  call A;
+  x := 3 { x is not visible here }
+end.

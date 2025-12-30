@@ -1,0 +1,10 @@
+procedure B;
+procedure A;
+begin
+end;
+begin
+  call A { this is ok }
+end;
+begin
+  call A { but this is not! }
+end.

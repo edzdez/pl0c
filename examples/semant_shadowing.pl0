@@ -1,0 +1,9 @@
+const a = 0;
+procedure p;
+const a = 1;
+begin
+  !a
+end;
+begin
+  !a
+end.

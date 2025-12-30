@@ -1,0 +1,8 @@
+procedure B;
+begin
+  call A  {A not yet declared! }
+end;
+procedure A;
+begin
+end;
+begin end.
