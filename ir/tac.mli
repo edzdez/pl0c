@@ -2,8 +2,8 @@
  * A simple 3-address IR with virtual registers.
  * We lower the elaborated AST produced by the semant pass to this representation.
  *)
-open! Core
 
+open! Core
 module Temp = Util.Temp
 module Symbol = Util.Symbol
 
@@ -35,8 +35,8 @@ and instr =
       ; s : sym
       }
   | Store of
-      { d : sym
-      ; s : operand
+      { s : operand
+      ; d : sym
       }
   | Move of
       { d : VirtReg.t
@@ -81,3 +81,5 @@ and bin_op =
   | Leq
   | Gt
   | Geq
+
+val to_string : program -> string
