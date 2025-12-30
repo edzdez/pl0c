@@ -1,0 +1,6 @@
+const a = 5;
+var b;
+begin
+  b := 5;
+  !(5 / (b - a)) { this cannot be caught at compile time }
+end.

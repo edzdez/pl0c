@@ -1,0 +1,11 @@
+const a = 1, b = 2, c = 3;
+procedure p;
+const a = 4;
+begin
+  if a + b < 5 then !c;
+  while 2 < 0 do call p
+end;
+begin
+  call p;
+  if a + b < 5 then !c
+end.

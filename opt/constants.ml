@@ -2,8 +2,9 @@ open! Core
 open Semant.East
 
 type constant_folding_error =
-  | Out_of_range
+  | Overflow
   | Division_by_zero
+[@@deriving sexp]
 
 exception Constant_folding_error of constant_folding_error Mark.t
 
@@ -105,5 +106,5 @@ and fold_binary op l r span =
             (try l / r with
              | Division_by_zero -> raise_error Division_by_zero span))
      with
-     | Failure _ -> raise_error Out_of_range span)
+     | Failure _ -> raise_error Overflow span)
 ;;

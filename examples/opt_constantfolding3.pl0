@@ -1,0 +1,5 @@
+const a = 4;
+var b;
+begin
+  !(2 + a * b) { should rewrite to 2 + 4 * b }
+end.

@@ -1,0 +1,4 @@
+const a = 5;
+begin
+  !(5 / (a - a)) { still a divide by zero }
+end.

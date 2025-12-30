@@ -10,8 +10,9 @@ open! Core
 open Semant.East
 
 type constant_folding_error =
-  | Out_of_range
+  | Overflow
   | Division_by_zero
+[@@deriving sexp]
 
 exception Constant_folding_error of constant_folding_error Mark.t
 

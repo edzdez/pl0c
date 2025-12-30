@@ -2,7 +2,7 @@
 
 (library
  (name pl0c_test)
- (libraries core ast parse semant)
+ (libraries core ast parse semant opt)
  (preprocess
   (pps ppx_jane))
  (inline_tests
