@@ -1,5 +1,5 @@
 open! Core
-open East
+open Semant.East
 
 type constant_folding_error =
   | Out_of_range

@@ -1,0 +1,5 @@
+(library
+ (name opt)
+ (libraries core semant util)
+ (preprocess
+  (pps ppx_jane)))

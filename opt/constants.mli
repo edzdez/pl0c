@@ -1,5 +1,4 @@
 (**
- * TODO: move this to an opt folder
  * Constant Folding.
  *
  * This module evaluates constant expressions at compile time.
@@ -8,7 +7,7 @@
  *)
 
 open! Core
-open East
+open Semant.East
 
 type constant_folding_error =
   | Out_of_range
