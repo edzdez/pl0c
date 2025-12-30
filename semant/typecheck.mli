@@ -9,3 +9,9 @@
  * This step emits errors for:
  *  - Invalid Types
  *)
+
+open! Core
+open East
+
+(** Typecheck the elaborated AST *)
+val typecheck : eblock -> eblock
