@@ -22,6 +22,7 @@ and estmt =
   | While of econd * estmt
   | Read of sym
   | Write of meexpr
+  | Nop
 
 and econd =
   | Odd of meexpr
@@ -101,6 +102,7 @@ and stmt_to_string ~indent s =
       (stmt_to_string ~indent:(indent + 1) s)
   | Read x -> sprintf "%s?%s" s_indent (Symbol.to_string x)
   | Write e -> sprintf "%s!(%s)" s_indent (expr_to_string e.data)
+  | Nop -> ""
 
 and cond_to_string c =
   match c with

@@ -25,6 +25,7 @@ and estmt =
   | While of econd * estmt
   | Read of sym
   | Write of meexpr
+  | Nop
 
 and econd =
   | Odd of meexpr
