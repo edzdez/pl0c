@@ -4,7 +4,7 @@
 
 open! Core
 
-type t [@@deriving sexp, compare, equal]
+type t [@@deriving sexp, compare, equal, hash]
 
 include Comparator.S with type t := t
 

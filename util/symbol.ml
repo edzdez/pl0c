@@ -1,6 +1,6 @@
 open! Core
 
-type t = int [@@deriving sexp]
+type t = int [@@deriving sexp, compare, equal]
 
 type entry =
   { name : string
@@ -14,6 +14,8 @@ and kind =
   | Var
   | Proc
 [@@deriving sexp]
+
+let create ?owner ?value name kind = { name; kind; owner; value }
 
 module Temp = Temp.Make ()
 

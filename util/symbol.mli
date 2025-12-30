@@ -4,7 +4,7 @@
 
 open! Core
 
-type t [@@deriving sexp]
+type t [@@deriving sexp, compare, equal]
 
 type entry =
   { name : string
@@ -18,6 +18,9 @@ and kind =
   | Var
   | Proc
 [@@deriving sexp]
+
+(** Create an entry *)
+val create : ?owner:t -> ?value:int32 -> string -> kind -> entry
 
 (** Add an entry to the symbol table. *)
 val add : entry -> t

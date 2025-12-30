@@ -1,7 +1,7 @@
 open! Core
 
 module T = struct
-  type t = int [@@deriving sexp, compare, equal]
+  type t = int [@@deriving sexp, compare, equal, hash]
 
   let by_value = Hashtbl.create (module String)
   let by_id = Hashtbl.create (module Int)
