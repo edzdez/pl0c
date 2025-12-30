@@ -30,6 +30,7 @@ and econd =
   | Odd of meexpr
   | Not of econd
   | Rel of rel * meexpr * meexpr
+  | Bool of bool
 
 and eexpr =
   | Unary of un_op * meexpr
@@ -38,3 +39,5 @@ and eexpr =
   | Sym of sym
 
 and meexpr = eexpr Mark.t
+
+val to_string : eblock -> string
