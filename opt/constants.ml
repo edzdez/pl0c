@@ -88,8 +88,8 @@ and fold_expr { data; span } =
 and fold_unary op n =
   Num
     (match op with
-     | UnPlus -> n
-     | UnMinus -> Int32.(-n))
+     | Un_plus -> n
+     | Un_minus -> Int32.(-n))
 
 and fold_binary op l r span =
   Num

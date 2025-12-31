@@ -9,14 +9,17 @@ module Symbol = Util.Symbol
 
 type sym = Symbol.t
 
-module VirtReg : Temp.Temp
+module Virt_reg : Temp.Temp
 module Label : Temp.Temp
 
 type operand =
-  | Reg of VirtReg.t
+  | Reg of Virt_reg.t
   | Const of Int32.t
 
-type program = proc list
+type program =
+  { globals : sym list
+  ; procedures : proc list
+  }
 
 and proc =
   { name : sym option
@@ -31,7 +34,7 @@ and block =
 
 and instr =
   | Load of
-      { d : VirtReg.t
+      { d : Virt_reg.t
       ; s : sym
       }
   | Store of
@@ -39,23 +42,23 @@ and instr =
       ; d : sym
       }
   | Move of
-      { d : VirtReg.t
+      { d : Virt_reg.t
       ; s : operand
       }
   | Bin_op of
-      { d : VirtReg.t
+      { d : Virt_reg.t
       ; op : bin_op
       ; l : operand
       ; r : operand
       }
   | Un_op of
-      { d : VirtReg.t
+      { d : Virt_reg.t
       ; op : un_op
       ; s : operand
       }
   | Jump of Label.t
   | Cond_jump of
-      { tst : VirtReg.t
+      { tst : Virt_reg.t
       ; yes : Label.t
       ; no : Label.t
       }
@@ -63,6 +66,7 @@ and instr =
   | Return
   | Read of sym
   | Write of operand
+  | Nop
 
 and un_op =
   | Plus

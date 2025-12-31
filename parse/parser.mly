@@ -155,9 +155,9 @@ expr:
 
 unary_op:
   | PLUS
-    { Ast.UnPlus }
+    { Ast.Un_plus }
   | MINUS
-    { Ast.UnMinus }
+    { Ast.Un_minus }
   ;
 
 add_op:

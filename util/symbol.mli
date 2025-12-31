@@ -7,6 +7,7 @@ open! Core
 type t [@@deriving sexp, compare, equal]
 
 val to_string : t -> string
+val to_string_hum : t -> string
 
 type entry =
   { name : string

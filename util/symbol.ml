@@ -31,3 +31,4 @@ let add entry =
 
 let get key = Hashtbl.find table key
 let get_exn key = Hashtbl.find_exn table key
+let to_string_hum t = Option.value_map ~default:"<unknown>" ~f:(fun e -> e.name) @@ get t

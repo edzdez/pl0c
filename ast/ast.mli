@@ -52,8 +52,8 @@ and expr =
 and mexpr = expr Mark.t
 
 and un_op =
-  | UnPlus
-  | UnMinus
+  | Un_plus
+  | Un_minus
 
 and bin_op =
   | Plus

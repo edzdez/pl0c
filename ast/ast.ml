@@ -46,8 +46,8 @@ and expr =
 and mexpr = expr Mark.t
 
 and un_op =
-  | UnPlus
-  | UnMinus
+  | Un_plus
+  | Un_minus
 
 and bin_op =
   | Plus
@@ -157,8 +157,8 @@ and expr_to_string e =
 
 and un_op_to_string op =
   match op with
-  | UnPlus -> "+"
-  | UnMinus -> "-"
+  | Un_plus -> "+"
+  | Un_minus -> "-"
 
 and bin_op_to_string op =
   match op with
