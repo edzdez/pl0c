@@ -1,6 +1,6 @@
 open! Core
 
-type t = int [@@deriving sexp, compare, equal]
+type t = int [@@deriving sexp, compare, equal, hash]
 
 let to_string t = sprintf "sym$%d" t
 

@@ -1,5 +1,5 @@
 module type Temp = sig
-  type t = int
+  type t = int [@@deriving sexp_of, compare, equal, hash]
 
   (** Reset the internal state.
       Note that subsequent calls to [fresh] may produce values that have been previously assigned. *)
@@ -10,7 +10,9 @@ module type Temp = sig
 end
 
 module Make () = struct
-  type t = int
+  open! Core
+
+  type t = int [@@deriving sexp_of, compare, equal, hash]
 
   let counter = ref 0
   let reset () = counter := 0

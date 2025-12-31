@@ -4,7 +4,7 @@
 
 open! Core
 
-type t [@@deriving sexp, compare, equal]
+type t [@@deriving sexp, compare, equal, hash]
 
 val to_string : t -> string
 val to_string_hum : t -> string

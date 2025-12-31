@@ -4,7 +4,7 @@
  *)
 
 module type Temp = sig
-  type t = int
+  type t = int [@@deriving sexp_of, compare, equal, hash]
 
   (** Reset the internal state.
       Note that subsequent calls to [fresh] may produce values that have been previously assigned. *)

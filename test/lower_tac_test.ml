@@ -93,18 +93,6 @@ let%expect_test "lowers a program with nested procedures" =
       {|
       globals: x
 
-      proc <main>:
-        locals:
-
-      L0:
-        store 0 -> x
-        call outer
-        t0 <- load x
-        write t0
-        return
-
-      end
-
       proc outer:
         locals: y
 
@@ -117,16 +105,28 @@ let%expect_test "lowers a program with nested procedures" =
 
       end
 
+      proc <main>:
+        locals:
+
+      L0:
+        store 0 -> x
+        call outer
+        t0 <- load x
+        write t0
+        return
+
+      end
+
       proc inner:
         locals:
 
       L0:
-        t2 <- load x
-        t3 <- t2 + 1
-        store t3 -> x
-        t0 <- load y
+        t0 <- load x
         t1 <- t0 + 1
-        store t1 -> y
+        store t1 -> x
+        t2 <- load y
+        t3 <- t2 + 1
+        store t3 -> y
         return
 
       end
@@ -145,20 +145,20 @@ let%expect_test "lowers if statements" =
       proc <main>:
         locals:
 
-      L2:
+      L0:
         store 10 -> x
         t0 <- load x
         t1 <- t0 > 5
-        cjump t1 L1 L0
+        cjump t1 L1 L2
 
 
       L1:
         t2 <- load x
         write t2
-        jump L0
+        jump L2
 
 
-      L0:
+      L2:
         return
 
       end
@@ -177,57 +177,57 @@ let%expect_test "lowers relations" =
       proc <main>:
         locals:
 
-      L8:
+      L0:
         store 10 -> x
         t0 <- load x
         t1 <- odd t0
         t2 <- not t1
-        cjump t2 L7 L0
+        cjump t2 L1 L8
 
 
-      L7:
-        t10 <- load x
-        t11 <- t10 =/= 10
-        cjump t11 L6 L5
-
-
-      L6:
-        t12 <- load x
-        t13 <- t12 + 1
-        write t13
-        jump L5
-
-
-      L5:
-        t6 <- load x
-        t7 <- t6 < 10
-        cjump t7 L4 L3
-
-
-      L4:
-        t8 <- load x
-        t9 <- t8 + 2
-        write t9
-        jump L3
-
-
-      L3:
+      L1:
         t3 <- load x
-        t4 <- t3 >= 10
-        cjump t4 L2 L1
+        t4 <- t3 =/= 10
+        cjump t4 L2 L3
 
 
       L2:
         t5 <- load x
-        write t5
-        jump L1
+        t6 <- t5 + 1
+        write t6
+        jump L3
 
 
-      L1:
-        jump L0
+      L3:
+        t7 <- load x
+        t8 <- t7 < 10
+        cjump t8 L4 L5
 
 
-      L0:
+      L4:
+        t9 <- load x
+        t10 <- t9 + 2
+        write t10
+        jump L5
+
+
+      L5:
+        t11 <- load x
+        t12 <- t11 >= 10
+        cjump t12 L6 L7
+
+
+      L6:
+        t13 <- load x
+        write t13
+        jump L7
+
+
+      L7:
+        jump L8
+
+
+      L8:
         return
 
       end
@@ -268,7 +268,7 @@ let%expect_test "lowers while loops" =
       proc <main>:
         locals:
 
-      L3:
+      L0:
         store 0 -> x
         jump L1
 
@@ -276,19 +276,19 @@ let%expect_test "lowers while loops" =
       L1:
         t0 <- load x
         t1 <- t0 < 5
-        cjump t1 L2 L0
+        cjump t1 L2 L3
 
 
       L2:
-        t4 <- load x
-        write t4
         t2 <- load x
-        t3 <- t2 + 1
-        store t3 -> x
+        write t2
+        t3 <- load x
+        t4 <- t3 + 1
+        store t4 -> x
         jump L1
 
 
-      L0:
+      L3:
         return
 
       end
