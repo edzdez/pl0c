@@ -68,16 +68,16 @@ and minstr =
   | Not of { dst : vreg }
   | Call of operand
   | Jmp of label
-  | JE of label
-  | JNE of label
-  | JL of label
-  | JLE of label
-  | JG of label
-  | JGE of label
-  | SETE of reg
-  | SETNE of reg
-  | SETL of reg
-  | SETLE of reg
-  | SETG of reg
-  | SETGE of reg
+  | Je of label
+  | Jne of label
+  | Jl of label
+  | Jle of label
+  | Jg of label
+  | Jge of label
+  | Sete of reg
+  | Setne of reg
+  | Setl of reg
+  | Setle of reg
+  | Setg of reg
+  | Setge of reg
   | Ret
