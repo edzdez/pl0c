@@ -4,40 +4,12 @@
  *)
 
 open! Core
-module Symbol = Ir.Tac.Symbol
-module Label = Ir.Tac.Label
-module Virt_reg = Ir.Tac.Virt_reg
 
-type vreg = Virt_reg.t
-type sym = Symbol.t
-
-type label =
-  { owner : sym option
-  ; label : Label.t
-  }
-
-type preg =
-  | RAX
-  | RBX
-  | RCX
-  | RDX
-  | RSI
-  | RDI
-  | RBP
-  | RSP
-  | R8
-  | R9
-  | R10
-  | R11
-  | R12
-  | R13
-  | R14
-  | R15
-[@@deriving sexp, compare, equal, hash]
-
-type reg =
-  | Phys of preg
-  | Virt of vreg
+type sym = Label.sym
+type label = Label.t
+type vreg = Reg.vreg
+type preg = Reg.preg
+type reg = Reg.reg
 
 type mem_addr =
   | Static of label
@@ -52,11 +24,21 @@ type operand =
   | Addr of mem_addr
   | Sym of sym
 
-type liveness =
+type program =
+  { data : sym list
+  ; code : block list
+  }
+
+and block =
+  { label : label
+  ; data : liveness list
+  }
+
+and liveness =
   { instr : minstr
-  ; uses : vreg Hash_set.t
-  ; defs : vreg Hash_set.t
-  ; clobbers : preg Hash_set.t
+  ; uses : reg Hash_set.t
+  ; defs : reg Hash_set.t
+  ; clobbers : reg Hash_set.t
   }
 
 and minstr =
