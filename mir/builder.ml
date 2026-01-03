@@ -26,8 +26,15 @@ let build { data; blocks } =
 
 let create globals = { data = globals; blocks = Hashtbl.create (module Label) }
 
-let add_instr { blocks; _ } ~label ~instr =
+let add_instr { blocks; _ } ~label instr =
   Hashtbl.update blocks label ~f:(function
     | None -> [ instr ]
     | Some xs -> instr :: xs)
+;;
+
+let add_instrs { blocks; _ } ~label instrs =
+  let instrs = List.rev instrs in
+  Hashtbl.update blocks label ~f:(function
+    | None -> instrs
+    | Some xs -> instrs @ xs)
 ;;

@@ -14,4 +14,7 @@ val build : t -> program
 val create : sym list -> t
 
 (** Append an instruction to the provided [label]. *)
-val add_instr : t -> label:label -> instr:minstr -> unit
+val add_instr : t -> label:label -> minstr -> unit
+
+(** Append multiple instructions to the provided [label]. *)
+val add_instrs : t -> label:label -> minstr list -> unit

@@ -1,2 +1,3 @@
 module Builder = Builder
-module Instr = Instr
+module Reg = Reg
+include Instr

@@ -22,7 +22,6 @@ type operand =
   | Imm32 of Int32.t
   | Reg of reg
   | Addr of mem_addr
-  | Sym of sym
 
 type program =
   { data : sym list
@@ -43,31 +42,31 @@ and liveness =
 
 and minstr =
   | Mov of
-      { dst : vreg
+      { dst : reg
       ; src : operand
       }
   | Add of
-      { dst : vreg
+      { dst : reg
       ; src : operand
       }
   | Sub of
-      { dst : vreg
+      { dst : reg
       ; src : operand
       }
   | IMul of
-      { dst : vreg
+      { dst : reg
       ; src : operand
       }
-  | IDiv of
-      { quot : vreg
-      ; rem : vreg
-      ; dividend : operand
-      ; divisor : operand
-      }
-  | Neg of { dst : vreg }
-  | Not of { dst : vreg }
+  | IDiv of operand
+  | Cdq
+  | Neg of { dst : reg }
+  | Not of { dst : reg }
   | Call of operand
   | Jmp of label
+  | Cmp of
+      { dst : reg
+      ; src : operand
+      }
   | Je of label
   | Jne of label
   | Jl of label

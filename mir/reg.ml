@@ -2,22 +2,14 @@ module Virt_reg = Ir.Tac.Virt_reg
 
 module Phys_reg = struct
   type t =
-    | RAX
-    | RBX
-    | RCX
-    | RDX
-    | RSI
-    | RDI
-    | RBP
-    | RSP
-    | R8
-    | R9
-    | R10
-    | R11
-    | R12
-    | R13
-    | R14
-    | R15
+    | EAX
+    | EBX
+    | ECX
+    | EDX
+    | ESI
+    | EDI
+    | EBP
+    | ESP
   [@@deriving sexp, compare, equal, hash]
 end
 
