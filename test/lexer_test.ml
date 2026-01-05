@@ -76,3 +76,10 @@ let%expect_test "properly lexes a complex program" =
     [%expect
       {| var ident[a] , ident[b] , ident[t] , ident[n] ; begin ident[a] := num[0] ; ident[b] := num[1] ; ? ident[n] ; while ident[n] > num[0] do begin ! ident[a] ; ident[t] := ident[a] + ident[b] ; ident[a] := ident[b] ; ident[b] := ident[t] ; ident[n] := ident[n] - num[1] end end . EOF |}])
 ;;
+
+let%expect_test "rejects reserved identifiers" =
+  let lexbuf = Lexing.from_string "_start _read _write" in
+  lex lexbuf;
+  [%expect
+    {| [1:0-1:1]: Unexpected character: _. |}]
+;;

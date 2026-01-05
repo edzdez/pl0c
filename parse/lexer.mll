@@ -43,11 +43,11 @@ let keyword_or_ident lexbuf =
 let ws    = [' ' '\t']+
 let nl    = '\r' | '\n' | "\r\n"
 
-let alpha = ['a'-'z' 'A'-'Z' '_']
+let alpha = ['a'-'z' 'A'-'Z']
 let digit = ['0'-'9']
 
 let num   = '0' | ['1'-'9'] digit*
-let ident = alpha (alpha | digit)*
+let ident = alpha (alpha | digit | '_')*
 
 rule read =
   parse
