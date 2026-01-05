@@ -22,7 +22,7 @@ type t =
 
 type vreg = Virt_reg.t
 type preg = Phys_reg.t
-type reg = t
+type reg = t [@@deriving equal]
 
 let to_string = function
   | Virt reg -> sprintf "%%v%d" reg
