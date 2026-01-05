@@ -9,6 +9,7 @@ type entry =
   ; kind : kind
   ; owner : t option
   ; value : Int32.t option
+  ; slot : Int32.t option
   }
 
 and kind =
@@ -17,7 +18,7 @@ and kind =
   | Proc
 [@@deriving sexp]
 
-let create ?owner ?value name kind = { name; kind; owner; value }
+let create ?owner ?value name kind = { name; kind; owner; value; slot = None }
 
 module Temp = Temp.Make ()
 
@@ -27,6 +28,12 @@ let add entry =
   let symb = Temp.fresh () in
   Hashtbl.add_exn table ~key:symb ~data:entry;
   symb
+;;
+
+let set_slot sym i =
+  Hashtbl.update table sym ~f:(function
+    | None -> failwith "no such symbol."
+    | Some entry -> { entry with slot = Some i })
 ;;
 
 let get key = Hashtbl.find table key
