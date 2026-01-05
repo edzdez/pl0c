@@ -10,4 +10,4 @@ let of_label ?owner label =
   | Some p -> sprintf ".%sL%d" (Symbol.get_exn p).name label
 ;;
 
-let of_global sym = sprintf "._%s" (Symbol.get_exn sym).name
+let of_global sym = sprintf "%s" (Symbol.get_exn sym).name

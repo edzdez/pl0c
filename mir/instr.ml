@@ -13,6 +13,7 @@ type reg = Reg.reg
 
 type mem_addr =
   | Static of label
+  | Function of label
   | Dynamic of
       { base : reg
       ; offset : Int32.t
@@ -86,3 +87,61 @@ and minstr =
   | Push of reg
   | Pop of reg
   | Ret
+
+let operand_to_string = function
+  | Imm32 n -> sprintf "$%ld" n
+  | Reg reg -> Reg.to_string reg
+  | Addr (Static l) -> sprintf "%s(%%rip)" l
+  | Addr (Function l) -> l
+  | Addr (Dynamic { base; offset }) -> sprintf "%ld(%s)" offset (Reg.to_string base)
+;;
+
+let instr_to_string = function
+  | Mov { dst; src } ->
+    (match src with
+     | Imm32 _ -> sprintf "movl %s, %s" (operand_to_string src) (operand_to_string dst)
+     | _ -> sprintf "mov %s, %s" (operand_to_string src) (operand_to_string dst))
+  | Lea { dst; src } -> sprintf "lea %s, %s" (operand_to_string src) (Reg.to_string dst)
+  | Add { dst; src } -> sprintf "add %s, %s" (operand_to_string src) (Reg.to_string dst)
+  | Sub { dst; src } -> sprintf "sub %s, %s" (operand_to_string src) (Reg.to_string dst)
+  | IMul { dst; src } -> sprintf "imul %s, %s" (operand_to_string src) (Reg.to_string dst)
+  | IDiv operand -> sprintf "idiv %s" (operand_to_string operand)
+  | Cdq -> "cdq"
+  | Neg reg -> sprintf "neg %s" (Reg.to_string reg)
+  | Not reg -> sprintf "not %s" (Reg.to_string reg)
+  | Call operand -> sprintf "call %s" (operand_to_string operand)
+  | Jmp label -> sprintf "jmp %s" label
+  | Cmp { dst; src } -> sprintf "cmp %s, %s" (operand_to_string src) (Reg.to_string dst)
+  | Je label -> sprintf "je %s" label
+  | Jne label -> sprintf "jne %s" label
+  | Jl label -> sprintf "jl %s" label
+  | Jle label -> sprintf "jle %s" label
+  | Jg label -> sprintf "jg %s" label
+  | Jge label -> sprintf "jge %s" label
+  | Sete reg -> sprintf "sete %s" (Reg.to_string reg)
+  | Setne reg -> sprintf "setne %s" (Reg.to_string reg)
+  | Setl reg -> sprintf "setl %s" (Reg.to_string reg)
+  | Setle reg -> sprintf "setle %s" (Reg.to_string reg)
+  | Setg reg -> sprintf "setg %s" (Reg.to_string reg)
+  | Setge reg -> sprintf "setge %s" (Reg.to_string reg)
+  | Push reg -> sprintf "push %s" (Reg.to_string reg)
+  | Pop reg -> sprintf "pop %s" (Reg.to_string reg)
+  | Ret -> "ret"
+;;
+
+let block_to_string { label; data } =
+  sprintf
+    "%s:\n%s"
+    (if String.(label = "._mainL0") then "main" else label)
+    (List.map data ~f:(fun { instr; _ } -> sprintf "  %s" @@ instr_to_string instr)
+     |> String.concat_lines)
+;;
+
+(** MIR to string without liveness information *)
+let to_string { data; code } =
+  sprintf
+    "  .data\n%s\n\n  .text\n  .globl main\n%s"
+    (List.map data ~f:(fun sym -> sprintf "%s: .long 0" @@ Label.of_global sym)
+     |> String.concat_lines)
+    (List.map code ~f:block_to_string |> String.concat ~sep:"\n\n")
+;;
