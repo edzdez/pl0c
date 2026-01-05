@@ -24,6 +24,11 @@ type operand =
   | Reg of reg
   | Addr of mem_addr
 
+let get_reg = function
+  | Reg r -> Some r
+  | _ -> None
+;;
+
 type program =
   { data : sym list
   ; code : block list
@@ -129,19 +134,30 @@ let instr_to_string = function
   | Ret -> "ret"
 ;;
 
-let block_to_string { label; data } =
+let liveness_to_string ~defs ~uses ~clobbers =
+  sprintf
+    "\t\t[ defs: { %s }; uses: { %s }; clobbers: { %s } ]"
+    (Hash_set.to_list defs |> List.map ~f:Reg.to_string |> String.concat ~sep:", ")
+    (Hash_set.to_list uses |> List.map ~f:Reg.to_string |> String.concat ~sep:", ")
+    (Hash_set.to_list clobbers |> List.map ~f:Reg.to_string |> String.concat ~sep:", ")
+;;
+
+let block_to_string ~liveness { label; data } =
   sprintf
     "%s:\n%s"
     (if String.(label = "._mainL0") then "main" else label)
-    (List.map data ~f:(fun { instr; _ } -> sprintf "  %s" @@ instr_to_string instr)
+    (List.map data ~f:(fun { instr; defs; uses; clobbers } ->
+       sprintf
+         "  %s%s"
+         (instr_to_string instr)
+         (if liveness then liveness_to_string ~defs ~uses ~clobbers else ""))
      |> String.concat ~sep:"\n")
 ;;
 
-(** MIR to string without liveness information *)
-let to_string { data; code } =
+let to_string ?(liveness = false) { data; code } =
   sprintf
     "  .data\n%s\n  .text\n  .globl main\n%s"
     (List.map data ~f:(fun sym -> sprintf "%s: .long 0" @@ Label.of_global sym)
      |> String.concat_lines)
-    (List.map code ~f:block_to_string |> String.concat ~sep:"\n\n")
+    (List.map code ~f:(block_to_string ~liveness) |> String.concat ~sep:"\n\n")
 ;;

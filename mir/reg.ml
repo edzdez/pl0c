@@ -12,6 +12,7 @@ module Phys_reg = struct
     | RDI
     | RBP
     | RSP
+    | FLAGS
   [@@deriving sexp, compare, equal, hash]
 end
 
@@ -35,4 +36,5 @@ let to_string = function
   | Phys RDI -> "%rdi"
   | Phys RBP -> "%rbp"
   | Phys RSP -> "%rsp"
+  | Phys FLAGS -> "FLAGS"
 ;;
