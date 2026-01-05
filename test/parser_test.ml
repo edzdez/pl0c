@@ -37,7 +37,8 @@ let%expect_test "parses simple programs" =
         const a = 10;
         var x;
         begin
-          x := (a) + (10)
+          x := (a) + (10);
+          !(x)
         end.
         |}])
 ;;

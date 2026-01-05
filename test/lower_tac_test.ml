@@ -47,6 +47,8 @@ let%expect_test "lowers a simple program" =
 
       L0:
         store 20 -> x
+        t0 <- load x
+        write t0
         return
 
       end
