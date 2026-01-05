@@ -23,3 +23,5 @@ In the future, we hope to support some additional features:
 - I should store a procedure's Temp generators (e.g. for virtual registers) in the symbol
   table; right now, we lose that information, and so we can't really generate additional
   virtual registers in later stages.
+- I think that both the IR and the MIR might be a bit _too_ low-level right now.
+  It makes it really hard to work with.
