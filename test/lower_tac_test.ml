@@ -23,7 +23,7 @@ let%expect_test "lowers the minimal program" =
       {|
       globals:
 
-      proc <main>:
+      proc _main:
         locals:
 
       L0:
@@ -42,7 +42,7 @@ let%expect_test "lowers a simple program" =
       {|
       globals: x
 
-      proc <main>:
+      proc _main:
         locals:
 
       L0:
@@ -62,7 +62,7 @@ let%expect_test "lowers a program with procedures" =
       {|
       globals: x
 
-      proc <main>:
+      proc _main:
         locals:
 
       L0:
@@ -105,7 +105,7 @@ let%expect_test "lowers a program with nested procedures" =
 
       end
 
-      proc <main>:
+      proc _main:
         locals:
 
       L0:
@@ -142,7 +142,7 @@ let%expect_test "lowers if statements" =
       {|
       globals: x
 
-      proc <main>:
+      proc _main:
         locals:
 
       L0:
@@ -174,7 +174,7 @@ let%expect_test "lowers relations" =
       {|
       globals: x
 
-      proc <main>:
+      proc _main:
         locals:
 
       L0:
@@ -243,7 +243,7 @@ let%expect_test "lowers nested scopes" =
       {|
       globals: x
 
-      proc <main>:
+      proc _main:
         locals:
 
       L0:
@@ -265,7 +265,7 @@ let%expect_test "lowers while loops" =
       {|
       globals: x
 
-      proc <main>:
+      proc _main:
         locals:
 
       L0:

@@ -129,7 +129,7 @@ let rec flatten ((p, { consts; vars; procs; stmt }) as inp : Symbol.t * Ast.eblo
 
 let lower ({ consts; vars; procs; stmt } : Ast.eblock) : Tac.program =
   let builder = Tac_builder.create vars in
-  let main_sym = Symbol.add (Symbol.create "<main>" Proc) in
+  let main_sym = Symbol.add (Symbol.create "_main" Proc) in
   let procedures = flatten (main_sym, { consts; vars = []; procs; stmt }) in
   List.iter procedures ~f:(Tac.lower_proc ~builder);
   Tac_builder.build builder
