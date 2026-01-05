@@ -24,7 +24,6 @@ let%expect_test "isel for the minimal program" =
       {|
         .data
 
-
         .text
         .globl main
       main:
@@ -47,7 +46,6 @@ let%expect_test "works for a simple program" =
       {|
         .data
       x: .long 0
-
 
         .text
         .globl main
@@ -78,7 +76,6 @@ let%expect_test "nested procedures" =
         .data
       x: .long 0
 
-
         .text
         .globl main
       .outerL0:
@@ -98,7 +95,6 @@ let%expect_test "nested procedures" =
         pop %rbp
         movl $0, %eax
         ret
-
 
       .innerL0:
         push %rbp
@@ -121,7 +117,6 @@ let%expect_test "nested procedures" =
         movl $0, %eax
         ret
 
-
       main:
         push %rbp
         mov %rsp, %rbp
@@ -139,5 +134,90 @@ let%expect_test "nested procedures" =
         pop %rbp
         movl $0, %eax
         ret
+      |}])
+;;
+
+let%expect_test "correctly generates code for if statements" =
+  In_channel.with_file "../examples/parse_if.pl0" ~f:(fun fin ->
+    let lexbuf = Lexing.from_channel fin in
+    let instrs = isel lexbuf in
+    printf "%s\n" (Mir.to_string instrs);
+    [%expect
+      {|
+        .data
+      x: .long 0
+
+        .text
+        .globl main
+      ._mainL1:
+        mov x(%rip), %v2
+        mov %v2, %edi
+        push %rbp
+        call _write
+        add $8, %rsp
+        jmp ._mainL2
+
+      ._mainL2:
+        add $8, %rsp
+        pop %rbp
+        movl $0, %eax
+        ret
+
+      main:
+        push %rbp
+        mov %rsp, %rbp
+        sub $8, %rsp
+        movl $10, x(%rip)
+        mov x(%rip), %v0
+        mov %v0, %v1
+        cmp $5, %v1
+        jg ._mainL1
+        jmp ._mainL2
+      |}])
+;;
+
+let%expect_test "correctly generates code for while loops" =
+  In_channel.with_file "../examples/parse_while.pl0" ~f:(fun fin ->
+    let lexbuf = Lexing.from_channel fin in
+    let instrs = isel lexbuf in
+    printf "%s\n" (Mir.to_string instrs);
+    [%expect
+      {|
+        .data
+      x: .long 0
+
+        .text
+        .globl main
+      ._mainL1:
+        mov x(%rip), %v0
+        mov %v0, %v1
+        cmp $5, %v1
+        jl ._mainL2
+        jmp ._mainL3
+
+      ._mainL2:
+        mov x(%rip), %v2
+        mov %v2, %edi
+        push %rbp
+        call _write
+        add $8, %rsp
+        mov x(%rip), %v3
+        mov %v3, %v4
+        add $1, %v4
+        mov %v4, x(%rip)
+        jmp ._mainL1
+
+      ._mainL3:
+        add $8, %rsp
+        pop %rbp
+        movl $0, %eax
+        ret
+
+      main:
+        push %rbp
+        mov %rsp, %rbp
+        sub $8, %rsp
+        movl $0, x(%rip)
+        jmp ._mainL1
       |}])
 ;;

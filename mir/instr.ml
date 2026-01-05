@@ -134,13 +134,13 @@ let block_to_string { label; data } =
     "%s:\n%s"
     (if String.(label = "._mainL0") then "main" else label)
     (List.map data ~f:(fun { instr; _ } -> sprintf "  %s" @@ instr_to_string instr)
-     |> String.concat_lines)
+     |> String.concat ~sep:"\n")
 ;;
 
 (** MIR to string without liveness information *)
 let to_string { data; code } =
   sprintf
-    "  .data\n%s\n\n  .text\n  .globl main\n%s"
+    "  .data\n%s\n  .text\n  .globl main\n%s"
     (List.map data ~f:(fun sym -> sprintf "%s: .long 0" @@ Label.of_global sym)
      |> String.concat_lines)
     (List.map code ~f:block_to_string |> String.concat ~sep:"\n\n")
