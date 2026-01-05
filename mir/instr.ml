@@ -15,7 +15,7 @@ type mem_addr =
   | Static of label
   | Dynamic of
       { base : reg
-      ; offset : int
+      ; offset : Int32.t
       }
 
 type operand =
@@ -42,6 +42,10 @@ and liveness =
 
 and minstr =
   | Mov of
+      { dst : operand
+      ; src : operand
+      }
+  | Lea of
       { dst : reg
       ; src : operand
       }
@@ -59,8 +63,8 @@ and minstr =
       }
   | IDiv of operand
   | Cdq
-  | Neg of { dst : reg }
-  | Not of { dst : reg }
+  | Neg of reg
+  | Not of reg
   | Call of operand
   | Jmp of label
   | Cmp of
@@ -79,4 +83,6 @@ and minstr =
   | Setle of reg
   | Setg of reg
   | Setge of reg
+  | Push of reg
+  | Pop of reg
   | Ret

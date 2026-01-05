@@ -8,8 +8,9 @@ module Phys_reg = struct
     | EDX
     | ESI
     | EDI
-    | EBP
-    | ESP
+    | RDI
+    | RBP
+    | RSP
   [@@deriving sexp, compare, equal, hash]
 end
 
