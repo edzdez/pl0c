@@ -33,6 +33,10 @@ val add : entry -> t
     Throws an exception if no such entry exists *)
 val set_slot : t -> Int32.t -> unit
 
+(** Set the owner for a symbol in the symbol table.
+    Throws an exception if no such entry exists *)
+val set_owner : t -> t -> unit
+
 (** Find the entry in the symbol table with the given id.
     If no such entry exists, returns [None]. *)
 val get : t -> entry option

@@ -36,6 +36,12 @@ let set_slot sym i =
     | Some entry -> { entry with slot = Some i })
 ;;
 
+let set_owner sym owner =
+  Hashtbl.update table sym ~f:(function
+    | None -> failwith "no such symbol."
+    | Some entry -> { entry with owner = Some owner })
+;;
+
 let get key = Hashtbl.find table key
 let get_exn key = Hashtbl.find_exn table key
 let to_string_hum t = Option.value_map ~default:"<unknown>" ~f:(fun e -> e.name) @@ get t
