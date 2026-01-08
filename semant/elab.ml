@@ -87,7 +87,7 @@ and elab_procs ?owner ~env proc_decl =
         Symbol.create
           ?owner
           (Ident.get_exn p.data)
-          (Symbol.Proc { tmp = (module Temp.Make ()) })
+          (Symbol.Proc { temps = (module Temp.Make ()); labels = (module Temp.Make ()) })
       in
       let symb = Symbol.add entry in
       let env = Env.add env ~key:p ~data:symb in

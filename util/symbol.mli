@@ -18,7 +18,10 @@ type entry =
 and kind =
   | Const of { value : Int32.t }
   | Var of { slot : Int32.t option }
-  | Proc of { tmp : (module Temp.Temp) }
+  | Proc of
+      { temps : (module Temp.Temp)
+      ; labels : (module Temp.Temp)
+      }
 
 (** Create an entry *)
 val create : ?owner:t -> string -> kind -> entry
