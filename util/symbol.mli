@@ -13,18 +13,15 @@ type entry =
   { name : string
   ; kind : kind
   ; owner : t option
-  ; value : Int32.t option
-  ; slot : Int32.t option
   }
 
 and kind =
-  | Const
-  | Var
-  | Proc
-[@@deriving sexp]
+  | Const of { value : Int32.t }
+  | Var of { slot : Int32.t option }
+  | Proc of { tmp : (module Temp.Temp) }
 
 (** Create an entry *)
-val create : ?owner:t -> ?value:int32 -> string -> kind -> entry
+val create : ?owner:t -> string -> kind -> entry
 
 (** Add an entry to the symbol table. *)
 val add : entry -> t

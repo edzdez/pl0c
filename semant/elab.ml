@@ -1,8 +1,6 @@
 open! Core
 open East
-module Symbol = Util.Symbol
-module Ident = Util.Ident
-module Mark = Util.Mark
+open Util
 
 type elab_error =
   | Undeclared_ident of string
@@ -60,11 +58,11 @@ let rec elab_block ?owner ~env ({ const_decl; var_decl; proc_decl; stmt } : Ast.
 and elab_consts ?owner ~env const_decl =
   let env, consts =
     List.rev const_decl
-    |> List.fold_right ~init:(env, []) ~f:(fun (c, n) (env, consts) ->
-      let entry = Symbol.create ?owner ~value:n (Ident.get_exn c.data) Symbol.Const in
+    |> List.fold_right ~init:(env, []) ~f:(fun (c, value) (env, consts) ->
+      let entry = Symbol.create ?owner (Ident.get_exn c.data) (Symbol.Const { value }) in
       let symb = Symbol.add entry in
       let env = Env.add env ~key:c ~data:symb in
-      env, (symb, n) :: consts)
+      env, (symb, value) :: consts)
   in
   env, List.rev consts
 
@@ -72,7 +70,9 @@ and elab_vars ?owner ~env var_decl =
   let env, vars =
     List.rev var_decl
     |> List.fold_right ~init:(env, []) ~f:(fun c (env, vars) ->
-      let entry = Symbol.create ?owner (Ident.get_exn c.data) Symbol.Var in
+      let entry =
+        Symbol.create ?owner (Ident.get_exn c.data) (Symbol.Var { slot = None })
+      in
       let symb = Symbol.add entry in
       let env = Env.add env ~key:c ~data:symb in
       env, symb :: vars)
@@ -83,7 +83,12 @@ and elab_procs ?owner ~env proc_decl =
   let env, procs =
     List.rev proc_decl
     |> List.fold_right ~init:(env, []) ~f:(fun (p, body) (env, procs) ->
-      let entry = Symbol.create ?owner (Ident.get_exn p.data) Symbol.Proc in
+      let entry =
+        Symbol.create
+          ?owner
+          (Ident.get_exn p.data)
+          (Symbol.Proc { tmp = (module Temp.Make ()) })
+      in
       let symb = Symbol.add entry in
       let env = Env.add env ~key:p ~data:symb in
       let _, body = elab_block ~owner:symb ~env:(Env.open_scope env) body in
@@ -120,14 +125,14 @@ and elab_lvalue ~env mident =
   let symb = Env.find env mident in
   let entry = Symbol.get_exn symb in
   match entry.kind with
-  | Var -> symb
+  | Var _ -> symb
   | _ -> raise_error not_lvalue mident
 
 and elab_proc ~env mident =
   let symb = Env.find env mident in
   let entry = Symbol.get_exn symb in
   match entry.kind with
-  | Proc -> symb
+  | Proc _ -> symb
   | _ -> raise_error not_procedure mident
 
 and elab_cond ~env c =

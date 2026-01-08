@@ -81,7 +81,7 @@ and fold_expr { data; span } =
      | Sym x ->
        let entry = Symbol.get_exn x in
        (match entry.kind with
-        | Const -> Num (Option.value_exn entry.value)
+        | Const { value } -> Num value
         | _ -> Sym x))
     span
 

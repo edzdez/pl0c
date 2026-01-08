@@ -8,17 +8,14 @@ type entry =
   { name : string
   ; kind : kind
   ; owner : t option
-  ; value : Int32.t option
-  ; slot : Int32.t option
   }
 
 and kind =
-  | Const
-  | Var
-  | Proc
-[@@deriving sexp]
+  | Const of { value : Int32.t }
+  | Var of { slot : Int32.t option }
+  | Proc of { tmp : (module Temp.Temp) }
 
-let create ?owner ?value name kind = { name; kind; owner; value; slot = None }
+let create ?owner name kind = { name; kind; owner }
 
 module Temp = Temp.Make ()
 
@@ -30,10 +27,13 @@ let add entry =
   symb
 ;;
 
-let set_slot sym i =
+let set_slot sym slot =
   Hashtbl.update table sym ~f:(function
     | None -> failwith "no such symbol."
-    | Some entry -> { entry with slot = Some i })
+    | Some entry ->
+      (match entry.kind with
+       | Var _ -> { entry with kind = Var { slot = Some slot } }
+       | _ -> failwith "invalid kind."))
 ;;
 
 let set_owner sym owner =
