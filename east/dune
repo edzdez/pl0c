@@ -1,5 +1,5 @@
 (library
- (name opt)
- (libraries core east util)
+ (name east)
+ (libraries core ast)
  (preprocess
   (pps ppx_jane)))

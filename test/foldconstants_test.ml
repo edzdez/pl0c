@@ -1,7 +1,7 @@
 open! Core
 module P = Parse.Parser
 module L = Parse.Lexer
-module C = Opt.Constants
+module C = Opt.Fold_constants
 module S = Semant
 module Mark = Util.Mark
 
@@ -26,7 +26,7 @@ let%expect_test "the minimal program passes through" =
     match ast with
     | None -> assert false
     | Some ast ->
-      printf "%s\n" (Semant.to_string ast);
+      printf "%s\n" (East.to_string ast);
       [%expect {| begin end. |}])
 ;;
 
@@ -37,7 +37,7 @@ let%expect_test "simple constant folding works" =
     match ast with
     | None -> assert false
     | Some ast ->
-      printf "%s\n" (Semant.to_string ast);
+      printf "%s\n" (East.to_string ast);
       [%expect
         {|
         begin
@@ -53,7 +53,7 @@ let%expect_test "simple constant folding with constant names works" =
     match ast with
     | None -> assert false
     | Some ast ->
-      printf "%s\n" (Semant.to_string ast);
+      printf "%s\n" (East.to_string ast);
       [%expect
         {|
         begin
@@ -69,7 +69,7 @@ let%expect_test "does not rewrite subexpressions with variables" =
     match ast with
     | None -> assert false
     | Some ast ->
-      printf "%s\n" (Semant.to_string ast);
+      printf "%s\n" (East.to_string ast);
       [%expect
         {|
         var sym$3;
@@ -104,7 +104,7 @@ let%expect_test "cannot catch divide by zeros with variables" =
     match ast with
     | None -> assert false
     | Some ast ->
-      printf "%s\n" (Semant.to_string ast);
+      printf "%s\n" (East.to_string ast);
       [%expect
         {|
         var sym$6;
@@ -131,7 +131,7 @@ let%expect_test "complex constant folding" =
     match ast with
     | None -> assert false
     | Some ast ->
-      printf "%s\n" (Semant.to_string ast);
+      printf "%s\n" (East.to_string ast);
       [%expect
         {|
         procedure sym$11;

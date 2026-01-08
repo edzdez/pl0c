@@ -7,14 +7,13 @@
  *)
 
 open! Core
-open Semant.East
 
 type constant_folding_error =
   | Overflow
   | Division_by_zero
 [@@deriving sexp]
 
-exception Constant_folding_error of constant_folding_error Mark.t
+exception Constant_folding_error of constant_folding_error Util.Mark.t
 
 (** Fold constants in the elaborated AST. *)
-val fold : eblock -> eblock
+val fold : East.eblock -> East.eblock

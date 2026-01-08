@@ -1,5 +1,5 @@
 open! Core
-open Semant.East
+open East
 
 type constant_folding_error =
   | Overflow

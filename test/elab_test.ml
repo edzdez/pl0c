@@ -24,7 +24,7 @@ let%expect_test "properly elaborates the minimal program" =
     match ast with
     | None -> assert false
     | Some ast ->
-      printf "%s\n" (Semant.to_string ast);
+      printf "%s\n" (East.to_string ast);
       [%expect {| begin end. |}])
 ;;
 
@@ -107,7 +107,7 @@ let%expect_test "properly supports variable shadowing" =
     match ast with
     | None -> assert false
     | Some ast ->
-      printf "%s\n" (Semant.to_string ast);
+      printf "%s\n" (East.to_string ast);
       [%expect
         {|
         const sym$7 = 0;
@@ -138,7 +138,7 @@ let%expect_test "properly elaborates a complex program" =
     match ast with
     | None -> assert false
     | Some ast ->
-      printf "%s\n" (Semant.to_string ast);
+      printf "%s\n" (East.to_string ast);
       [%expect
         {|
         var sym$12, sym$13, sym$14, sym$15;
