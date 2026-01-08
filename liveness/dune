@@ -1,5 +1,0 @@
-(library
- (name liveness)
- (libraries core util mir)
- (preprocess
-  (pps ppx_jane)))

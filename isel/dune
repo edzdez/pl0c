@@ -1,5 +1,0 @@
-(library
- (name isel)
- (libraries core ir mir util)
- (preprocess
-  (pps ppx_jane)))

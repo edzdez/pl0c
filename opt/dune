@@ -1,5 +1,5 @@
 (library
  (name opt)
- (libraries core semant mir util)
+ (libraries core semant util)
  (preprocess
   (pps ppx_jane)))
