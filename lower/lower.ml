@@ -100,11 +100,11 @@ let rec lower_stmt ~builder ~label = function
   | While (cond, stmt) ->
     let test = Builder.init_block builder in
     Builder.set_terminator builder ~label (Jmp test);
-    let cond = lower_cond ~builder ~label cond in
+    let cond = lower_cond ~builder ~label:test cond in
     let yes = Builder.init_block builder in
     let yes_exit = lower_stmt ~builder ~label:yes stmt in
     let no = Builder.init_block builder in
-    Builder.set_terminator builder ~label (Br { cond; yes; no });
+    Builder.set_terminator builder ~label:test (Br { cond; yes; no });
     Builder.set_terminator builder ~label:yes_exit (Jmp test);
     no
   | Read x ->

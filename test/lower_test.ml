@@ -226,12 +226,12 @@ let%expect_test "lowers while loops" =
       proc _main {
       L0:
         store i32 0, ptr<i32> @x
+        jmp label L1
+
+      L1:
         %t0 := load ptr<i32> @x
         %t1 := lt i32 %t0, 5
         br i1 %t1, label L2, label L3
-
-      L1:
-        ret
 
       L2:
         %t2 := load ptr<i32> @x
