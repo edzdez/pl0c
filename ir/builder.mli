@@ -28,3 +28,6 @@ val add_instr : t -> label:Label.t -> Instr.instr -> unit
 (** Set the terminator for the basic block with the provided [label].
     Throws an exception if no such block exists. *)
 val set_terminator : t -> label:Label.t -> Instr.term -> unit
+
+(** Generate a fresh temporary value. *)
+val fresh_tmp : t -> Util.Temp.t

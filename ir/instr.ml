@@ -91,11 +91,15 @@ let ty_to_string = function
 
 let kind_to_string = function
   | Lit n -> Int32.to_string n
-  | Ptr s -> (Symbol.get_exn s).name
+  | Ptr s -> sprintf "@%s" (Symbol.get_exn s).name
   | Tmp tmp -> sprintf "%%t%d" tmp
 ;;
 
-let value_to_string { ty; kind } = sprintf "%s %s" (ty_to_string ty) (kind_to_string kind)
+let value_to_string { ty; kind } =
+  match kind with
+  | Ptr _ -> sprintf "ptr<%s> %s" (ty_to_string ty) (kind_to_string kind)
+  | _ -> sprintf "%s %s" (ty_to_string ty) (kind_to_string kind)
+;;
 
 let globals_to_string globals =
   List.map globals ~f:(fun { ty; kind } ->
@@ -122,8 +126,8 @@ let join_to_string { dst; srcs } =
 let binary_to_string ~op { dst; lhs; rhs } =
   sprintf
     "%s := %s %s, %s"
-    op
     (kind_to_string dst.kind)
+    op
     (value_to_string lhs)
     (kind_to_string rhs.kind)
 ;;
@@ -172,19 +176,20 @@ let block_to_string { label; joins; instrs; terminator } =
     label
     ([ List.map joins ~f:join_to_string |> String.concat ~sep:"\n"
      ; String.concat ~sep:"\n"
-       @@ List.map instrs ~f:instr_to_string
-       @ [ terminator_to_string terminator ]
+       @@ List.map instrs ~f:(fun instr -> sprintf "  %s" (instr_to_string instr))
+       @ [ sprintf "  %s" (terminator_to_string terminator) ]
      ]
+     |> List.filter ~f:(Fn.compose not String.is_empty)
      |> String.concat_lines)
 ;;
 
 let procedures_to_string procedures =
   List.map procedures ~f:(fun { name; blocks } ->
     sprintf
-      "proc %s {%s}"
+      "proc %s {\n%s}"
       (Symbol.get_exn name).name
-      (List.map blocks ~f:block_to_string |> String.concat_lines))
-  |> String.concat ~sep:"\n"
+      (List.map blocks ~f:block_to_string |> String.concat ~sep:"\n"))
+  |> String.concat ~sep:"\n\n"
 ;;
 
 let to_string { globals; procedures } =

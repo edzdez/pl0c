@@ -39,12 +39,18 @@ let unwrap_proc = function
   | Some proc -> proc
 ;;
 
+let fresh (module T : Util.Temp.Temp) = T.fresh ()
+
 let init_block { curr_proc; procedures; _ } =
   let proc = unwrap_proc curr_proc in
-  let label = Label.fresh () in
-  let blocks = Hashtbl.find_exn procedures proc in
-  Hashtbl.add_exn blocks ~key:label ~data:([], Ret);
-  label
+  let entry = Symbol.get_exn proc in
+  match entry.kind with
+  | Proc { labels; _ } ->
+    let label = fresh labels in
+    let blocks = Hashtbl.find_exn procedures proc in
+    Hashtbl.add_exn blocks ~key:label ~data:([], Ret);
+    label
+  | _ -> failwith "not a proc!"
 ;;
 
 let add_instr { curr_proc; procedures; _ } ~label instr =
@@ -61,4 +67,12 @@ let set_terminator { curr_proc; procedures; _ } ~label term =
   Hashtbl.update blocks label ~f:(function
     | None -> failwith "basic block does not exist"
     | Some (instrs, _) -> instrs, term)
+;;
+
+let fresh_tmp { curr_proc; _ } =
+  let proc = unwrap_proc curr_proc in
+  let entry = Symbol.get_exn proc in
+  match entry.kind with
+  | Proc { temps; _ } -> fresh temps
+  | _ -> failwith "not a proc!"
 ;;
