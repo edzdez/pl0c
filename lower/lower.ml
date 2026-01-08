@@ -13,9 +13,8 @@ let mk_var x = { kind = Ptr x; ty = I32 }
 let mk_i32 x = { kind = Lit x; ty = I32 }
 
 let reserve_slots ~builder ~entry vars =
-  List.iteri vars ~f:(fun i sym ->
+  List.iter vars ~f:(fun sym ->
     let v = mk_var sym in
-    Symbol.set_slot sym @@ Int32.of_int_exn (i + 1);
     Builder.add_instr builder ~label:entry (Alloca v))
 ;;
 
