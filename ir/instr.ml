@@ -49,7 +49,7 @@ and block =
   }
 
 and phi =
-  { dst : value
+  { mutable dst : value
   ; srcs : (lbl, value) Hashtbl.t
   }
 

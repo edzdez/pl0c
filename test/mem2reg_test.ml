@@ -149,7 +149,7 @@ let%expect_test "works on ifs" =
         jmp label L2
 
       L2:
-        %t3 := phi i32
+        @x := phi i32
 
         store i32 2, ptr<i32> @x
         %t2 := load ptr<i32> @x
@@ -186,7 +186,7 @@ let%expect_test "works on while loops" =
         jmp label L1
 
       L1:
-        %t5 := phi i32
+        @i := phi i32
 
         %t0 := load ptr<i32> @i
         %t1 := lt i32 %t0, 10
@@ -250,8 +250,8 @@ let%expect_test "works with complex control flow" =
         jmp label L1
 
       L1:
-        %t10 := phi i32
-        %t8 := phi i32
+        @x := phi i32
+        @y := phi i32
 
         %t0 := load ptr<i32> @y
         %t1 := lt i32 %t0, 10
@@ -269,7 +269,7 @@ let%expect_test "works with complex control flow" =
         jmp label L4
 
       L4:
-        %t9 := phi i32
+        @x := phi i32
 
         %t6 := load ptr<i32> @y
         %t7 := add i32 %t6, 1

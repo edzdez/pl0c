@@ -154,7 +154,7 @@ let find_frontiers ~graph ~idoms ~dom_tree =
   df
 ;;
 
-let mk_tmp ~p =
+let _mk_tmp ~p =
   let fresh (module T : Util.Temp.Temp) = T.fresh () in
   let tmp =
     match (Symbol.get_exn p).kind with
@@ -164,7 +164,7 @@ let mk_tmp ~p =
   { kind = Tmp tmp; ty = I32 }
 ;;
 
-let insert_phis_for ~x ~dom_frontiers { name; blocks } =
+let insert_phis_for ~x ~dom_frontiers { blocks; _ } =
   let work =
     List.filter_map blocks ~f:(fun { label; instrs; _ } ->
       List.find instrs ~f:(function
@@ -181,8 +181,11 @@ let insert_phis_for ~x ~dom_frontiers { name; blocks } =
     |> List.iter ~f:(fun b ->
       if not @@ Hash_set.mem has_phi b
       then (
-        let dst = mk_tmp ~p:name in
-        let phi = { dst; srcs = Hashtbl.create (module Lbl) } in
+        (* let dst = mk_tmp ~p:name in *)
+        (* dummy *)
+        let phi =
+          { dst = { kind = Ptr x; ty = I32 }; srcs = Hashtbl.create (module Lbl) }
+        in
         let block = List.find_exn blocks ~f:(fun { label; _ } -> label = b) in
         block.joins <- phi :: block.joins;
         Hash_set.add has_phi b;
@@ -202,6 +205,7 @@ let mem2reg_proc ~promotable ({ name; blocks } as proc) =
   let dom_tree = invert_idoms idoms in
   let dom_frontiers = find_frontiers ~graph ~idoms ~dom_tree in
   List.iter promotable ~f:(fun x -> insert_phis_for ~x ~dom_frontiers proc);
+  (* TODO *)
   eprintf "proc: %s\n" (Symbol.get_exn name).name;
   eprintf "  succs:\n";
   Hashtbl.iteri graph ~f:(fun ~key ~data ->
@@ -221,7 +225,6 @@ let mem2reg_proc ~promotable ({ name; blocks } as proc) =
       "    L%d -> [%s]\n"
       key
       (Hash_set.to_list data |> List.map ~f:(sprintf "L%d") |> String.concat ~sep:", "));
-  (* TODO *)
   ignore promotable;
   ignore name;
   { name; blocks }
