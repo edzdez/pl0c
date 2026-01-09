@@ -1,0 +1,10 @@
+procedure p;
+var z;
+begin
+  z := 1;
+  z := z + 1;
+  !z
+end;
+begin
+  call p
+end.

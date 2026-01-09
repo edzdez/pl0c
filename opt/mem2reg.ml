@@ -154,12 +154,54 @@ let find_frontiers ~graph ~idoms ~dom_tree =
   df
 ;;
 
-let mem2reg_proc ~promotable { name; blocks } =
+let mk_tmp ~p =
+  let fresh (module T : Util.Temp.Temp) = T.fresh () in
+  let tmp =
+    match (Symbol.get_exn p).kind with
+    | Proc { temps; _ } -> fresh temps
+    | _ -> failwith "not a proc!"
+  in
+  { kind = Tmp tmp; ty = I32 }
+;;
+
+let insert_phis_for ~x ~dom_frontiers { name; blocks } =
+  let work =
+    List.filter_map blocks ~f:(fun { label; instrs; _ } ->
+      List.find instrs ~f:(function
+        | Store { dst = { kind = Ptr p; _ }; _ } when Symbol.equal p x -> true
+        | _ -> false)
+      |> Option.map ~f:(const label))
+    |> Queue.of_list
+  in
+  let has_phi = Hash_set.create (module Lbl) in
+  while not @@ Queue.is_empty work do
+    let d = Queue.dequeue_exn work in
+    Hashtbl.find dom_frontiers d
+    |> Option.value_map ~default:[] ~f:Hash_set.to_list
+    |> List.iter ~f:(fun b ->
+      if not @@ Hash_set.mem has_phi b
+      then (
+        let dst = mk_tmp ~p:name in
+        let phi = { dst; srcs = Hashtbl.create (module Lbl) } in
+        let block = List.find_exn blocks ~f:(fun { label; _ } -> label = b) in
+        block.joins <- phi :: block.joins;
+        Hash_set.add has_phi b;
+        Queue.enqueue work b))
+  done
+;;
+
+let mem2reg_proc ~promotable ({ name; blocks } as proc) =
+  let promotable =
+    Hash_set.filter promotable ~f:(fun x ->
+      Option.equal Symbol.equal (Symbol.get_exn x).owner (Some name))
+    |> Hash_set.to_list
+  in
   let preds = predecessors blocks in
   let graph = successors preds in
   let idoms = Lengauer_tarjan.find_idoms ~graph ~preds in
   let dom_tree = invert_idoms idoms in
   let dom_frontiers = find_frontiers ~graph ~idoms ~dom_tree in
+  List.iter promotable ~f:(fun x -> insert_phis_for ~x ~dom_frontiers proc);
   eprintf "proc: %s\n" (Symbol.get_exn name).name;
   eprintf "  succs:\n";
   Hashtbl.iteri graph ~f:(fun ~key ~data ->
@@ -191,7 +233,8 @@ let mem2reg { globals; procedures } =
     let not_promotable = Hash_set.create (module Symbol) in
     let mark_not_promotable ~name x =
       let owner = (Symbol.get_exn x).owner in
-      if Option.equal Symbol.equal owner (Some name) then Hash_set.add not_promotable x
+      if not @@ Option.equal Symbol.equal owner (Some name)
+      then Hash_set.add not_promotable x
     in
     List.iter procedures ~f:(fun { name; blocks } ->
       List.iter blocks ~f:(fun { instrs; _ } ->
@@ -200,6 +243,7 @@ let mem2reg { globals; procedures } =
           | Read { kind = Ptr p; _ } -> mark_not_promotable ~name p
           | Store { dst = { kind = Ptr p; _ }; _ } -> mark_not_promotable ~name p
           | Load { src = { kind = Ptr p; _ }; _ } -> mark_not_promotable ~name p
+          | Write { kind = Ptr p; _ } -> mark_not_promotable ~name p
           | _ -> () (* pointer operations can only occur in the above few places *))));
     Hash_set.diff locals not_promotable
   in

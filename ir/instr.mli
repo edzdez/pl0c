@@ -43,9 +43,9 @@ and procedure =
 
 and block =
   { label : lbl
-  ; joins : phi list
-  ; instrs : instr list
-  ; terminator : term
+  ; mutable joins : phi list
+  ; mutable instrs : instr list
+  ; mutable terminator : term
   }
 
 and phi =

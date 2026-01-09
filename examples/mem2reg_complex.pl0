@@ -1,0 +1,14 @@
+procedure p;
+var x, y;
+begin
+  x := 0;
+  y := 0;
+  while y < 10 do
+  begin
+    if y < 5 then x := x + 1;
+    y := y + 1
+  end
+end;
+begin
+  call p
+end.

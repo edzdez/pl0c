@@ -88,119 +88,128 @@ let%expect_test "does not promote variables referenced in nested scopes" =
       |}])
 ;;
 
-let%expect_test "works with many ifs" =
-  In_channel.with_file "../examples/parse_logicaloperators.pl0" ~f:(fun fin ->
+let%expect_test "works with linear code" =
+  In_channel.with_file "../examples/mem2reg_straightline.pl0" ~f:(fun fin ->
     let lexbuf = Lexing.from_channel fin in
     let ir = opt lexbuf in
     printf "%s\n" (Ir.to_string ir);
     [%expect
       {|
-      @x := global i32
-
       proc _main {
       L0:
-        store i32 10, ptr<i32> @x
-        %t0 := load ptr<i32> @x
-        %t1 := odd i32 %t0
-        %t2 := not i1 %t1
-        br i1 %t2, label L1, label L8
+        call p
+        ret
+      }
 
-      L1:
-        %t3 := load ptr<i32> @x
-        %t4 := neq i32 %t3, 10
-        br i1 %t4, label L2, label L3
-
-      L2:
-        %t5 := load ptr<i32> @x
-        %t6 := add i32 %t5, 1
-        write i32 %t6
-        jmp label L3
-
-      L3:
-        %t7 := load ptr<i32> @x
-        %t8 := lt i32 %t7, 10
-        br i1 %t8, label L4, label L5
-
-      L4:
-        %t9 := load ptr<i32> @x
-        %t10 := add i32 %t9, 2
-        write i32 %t10
-        jmp label L5
-
-      L5:
-        %t11 := load ptr<i32> @x
-        %t12 := geq i32 %t11, 10
-        br i1 %t12, label L6, label L7
-
-      L6:
-        %t13 := load ptr<i32> @x
-        write i32 %t13
-        jmp label L7
-
-      L7:
-        jmp label L8
-
-      L8:
+      proc p {
+      L0:
+        @z := alloca i32
+        store i32 1, ptr<i32> @z
+        %t0 := load ptr<i32> @z
+        %t1 := add i32 %t0, 1
+        store i32 %t1, ptr<i32> @z
+        %t2 := load ptr<i32> @z
+        write i32 %t2
         ret
       }
       proc: _main
         succs:
-          L0 -> [L1, L8]
-          L5 -> [L7, L6]
-          L4 -> [L5]
-          L6 -> [L7]
-          L7 -> [L8]
-          L2 -> [L3]
-          L3 -> [L4, L5]
-          L1 -> [L3, L2]
         dom_tree:
-          L0 -> [L1, L8]
-          L5 -> [L7, L6]
-          L3 -> [L4, L5]
-          L1 -> [L3, L2]
         dom_frontiers:
-          L0 -> []
-          L5 -> [L8]
-          L4 -> [L5]
-          L6 -> [L7]
-          L7 -> [L8]
-          L2 -> [L3]
-          L3 -> [L8]
-          L1 -> [L8]
+      proc: p
+        succs:
+        dom_tree:
+        dom_frontiers:
       |}])
 ;;
 
-let%expect_test "identifies while loops" =
-  In_channel.with_file "../examples/parse_while.pl0" ~f:(fun fin ->
+let%expect_test "works on ifs" =
+  In_channel.with_file "../examples/mem2reg_if.pl0" ~f:(fun fin ->
     let lexbuf = Lexing.from_channel fin in
     let ir = opt lexbuf in
     printf "%s\n" (Ir.to_string ir);
     [%expect
       {|
-      @x := global i32
-
       proc _main {
       L0:
-        store i32 0, ptr<i32> @x
-        jmp label L1
+        call p
+        ret
+      }
 
-      L1:
+      proc p {
+      L0:
+        @x := alloca i32
+        store i32 0, ptr<i32> @x
         %t0 := load ptr<i32> @x
         %t1 := lt i32 %t0, 5
-        br i1 %t1, label L2, label L3
+        br i1 %t1, label L1, label L2
+
+      L1:
+        store i32 1, ptr<i32> @x
+        jmp label L2
 
       L2:
+        %t3 := phi i32
+
+        store i32 2, ptr<i32> @x
         %t2 := load ptr<i32> @x
         write i32 %t2
-        %t3 := load ptr<i32> @x
-        %t4 := add i32 %t3, 1
-        store i32 %t4, ptr<i32> @x
-        jmp label L1
-
-      L3:
         ret
       }
       proc: _main
+        succs:
+        dom_tree:
+        dom_frontiers:
+      proc: p
+        succs:
+          L0 -> [L2, L1]
+          L1 -> [L2]
+        dom_tree:
+          L0 -> [L1, L2]
+        dom_frontiers:
+          L0 -> []
+          L1 -> [L2]
+      |}])
+;;
+
+let%expect_test "works on while loops" =
+  In_channel.with_file "../examples/mem2reg_while.pl0" ~f:(fun fin ->
+    let lexbuf = Lexing.from_channel fin in
+    let ir = opt lexbuf in
+    printf "%s\n" (Ir.to_string ir);
+    [%expect
+      {|
+      proc p {
+      L0:
+        @i := alloca i32
+        store i32 0, ptr<i32> @i
+        jmp label L1
+
+      L1:
+        %t5 := phi i32
+
+        %t0 := load ptr<i32> @i
+        %t1 := lt i32 %t0, 10
+        br i1 %t1, label L2, label L3
+
+      L2:
+        %t2 := load ptr<i32> @i
+        %t3 := add i32 %t2, 1
+        store i32 %t3, ptr<i32> @i
+        jmp label L1
+
+      L3:
+        %t4 := load ptr<i32> @i
+        write i32 %t4
+        ret
+      }
+
+      proc _main {
+      L0:
+        call p
+        ret
+      }
+      proc: p
         succs:
           L0 -> [L1]
           L2 -> [L1]
@@ -211,6 +220,85 @@ let%expect_test "identifies while loops" =
         dom_frontiers:
           L0 -> []
           L2 -> [L1]
+          L1 -> [L1]
+      proc: _main
+        succs:
+        dom_tree:
+        dom_frontiers:
+      |}])
+;;
+
+let%expect_test "works with complex control flow" =
+  In_channel.with_file "../examples/mem2reg_complex.pl0" ~f:(fun fin ->
+    let lexbuf = Lexing.from_channel fin in
+    let ir = opt lexbuf in
+    printf "%s\n" (Ir.to_string ir);
+    [%expect
+      {|
+      proc _main {
+      L0:
+        call p
+        ret
+      }
+
+      proc p {
+      L0:
+        @x := alloca i32
+        @y := alloca i32
+        store i32 0, ptr<i32> @x
+        store i32 0, ptr<i32> @y
+        jmp label L1
+
+      L1:
+        %t10 := phi i32
+        %t8 := phi i32
+
+        %t0 := load ptr<i32> @y
+        %t1 := lt i32 %t0, 10
+        br i1 %t1, label L2, label L5
+
+      L2:
+        %t2 := load ptr<i32> @y
+        %t3 := lt i32 %t2, 5
+        br i1 %t3, label L3, label L4
+
+      L3:
+        %t4 := load ptr<i32> @x
+        %t5 := add i32 %t4, 1
+        store i32 %t5, ptr<i32> @x
+        jmp label L4
+
+      L4:
+        %t9 := phi i32
+
+        %t6 := load ptr<i32> @y
+        %t7 := add i32 %t6, 1
+        store i32 %t7, ptr<i32> @y
+        jmp label L1
+
+      L5:
+        ret
+      }
+      proc: _main
+        succs:
+        dom_tree:
+        dom_frontiers:
+      proc: p
+        succs:
+          L0 -> [L1]
+          L4 -> [L1]
+          L2 -> [L3, L4]
+          L3 -> [L4]
+          L1 -> [L2, L5]
+        dom_tree:
+          L0 -> [L1]
+          L2 -> [L3, L4]
+          L1 -> [L2, L5]
+        dom_frontiers:
+          L0 -> []
+          L4 -> [L1]
+          L2 -> [L1]
+          L3 -> [L4]
           L1 -> [L1]
       |}])
 ;;

@@ -43,9 +43,9 @@ and procedure =
 
 and block =
   { label : lbl
-  ; joins : phi list
-  ; instrs : instr list
-  ; terminator : term
+  ; mutable joins : phi list
+  ; mutable instrs : instr list
+  ; mutable terminator : term
   }
 
 and phi =
@@ -113,7 +113,7 @@ let lbl_to_string i = sprintf "L%d" i
 
 let join_to_string { dst; srcs } =
   sprintf
-    "%s := phi %s %s"
+    "  %s := phi %s %s"
     (kind_to_string dst.kind)
     (ty_to_string dst.ty)
     (Hashtbl.to_alist srcs
@@ -180,15 +180,15 @@ let block_to_string { label; joins; instrs; terminator } =
        @ [ sprintf "  %s" (terminator_to_string terminator) ]
      ]
      |> List.filter ~f:(Fn.compose not String.is_empty)
-     |> String.concat_lines)
+     |> String.concat ~sep:"\n\n")
 ;;
 
 let procedures_to_string procedures =
   List.map procedures ~f:(fun { name; blocks } ->
     sprintf
-      "proc %s {\n%s}"
+      "proc %s {\n%s\n}"
       (Symbol.get_exn name).name
-      (List.map blocks ~f:block_to_string |> String.concat ~sep:"\n"))
+      (List.map blocks ~f:block_to_string |> String.concat ~sep:"\n\n"))
   |> String.concat ~sep:"\n\n"
 ;;
 

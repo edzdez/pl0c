@@ -1,0 +1,11 @@
+procedure p;
+var x;
+begin
+  x := 0;
+  if x < 5 then x := 1;
+  x := 2;
+  !x
+end;
+begin
+  call p
+end.
