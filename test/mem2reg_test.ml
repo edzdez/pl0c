@@ -30,8 +30,8 @@ let%expect_test "doesn't promote globals" =
       }
       proc: _main
         succs:
-        idoms:
-          L0 -> L0
+        dom_tree:
+        dom_frontiers:
       |}])
 ;;
 
@@ -75,16 +75,16 @@ let%expect_test "does not promote variables referenced in nested scopes" =
       }
       proc: _main
         succs:
-        idoms:
-          L0 -> L0
+        dom_tree:
+        dom_frontiers:
       proc: inner
         succs:
-        idoms:
-          L0 -> L0
+        dom_tree:
+        dom_frontiers:
       proc: outer
         succs:
-        idoms:
-          L0 -> L0
+        dom_tree:
+        dom_frontiers:
       |}])
 ;;
 
@@ -153,16 +153,20 @@ let%expect_test "works with many ifs" =
           L2 -> [L3]
           L3 -> [L4, L5]
           L1 -> [L3, L2]
-        idoms:
-          L5 -> L3
-          L4 -> L3
-          L6 -> L5
-          L7 -> L5
-          L2 -> L1
-          L0 -> L0
-          L8 -> L0
-          L3 -> L1
-          L1 -> L0
+        dom_tree:
+          L0 -> [L1, L8]
+          L5 -> [L7, L6]
+          L3 -> [L4, L5]
+          L1 -> [L3, L2]
+        dom_frontiers:
+          L0 -> []
+          L5 -> [L8]
+          L4 -> [L5]
+          L6 -> [L7]
+          L7 -> [L8]
+          L2 -> [L3]
+          L3 -> [L8]
+          L1 -> [L8]
       |}])
 ;;
 
@@ -201,10 +205,12 @@ let%expect_test "identifies while loops" =
           L0 -> [L1]
           L2 -> [L1]
           L1 -> [L3, L2]
-        idoms:
-          L0 -> L0
-          L2 -> L1
-          L3 -> L1
-          L1 -> L0
+        dom_tree:
+          L0 -> [L1]
+          L1 -> [L3, L2]
+        dom_frontiers:
+          L0 -> []
+          L2 -> [L1]
+          L1 -> [L1]
       |}])
 ;;

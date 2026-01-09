@@ -119,10 +119,47 @@ let successors preds =
   succs
 ;;
 
+let invert_idoms idoms =
+  let dom_tree = Hashtbl.create (module Lbl) in
+  Hashtbl.iteri idoms ~f:(fun ~key ~data ->
+    if key <> data
+    then
+      Hashtbl.update dom_tree data ~f:(function
+        | None -> [ key ]
+        | Some children -> key :: children));
+  dom_tree
+;;
+
+let find_frontiers ~graph ~idoms ~dom_tree =
+  let df = Hashtbl.map graph ~f:(fun _ -> Hash_set.create (module Lbl)) in
+  let try_add_to_frontier u v =
+    if not @@ Option.equal Lbl.equal (Hashtbl.find idoms v) (Some u)
+    then Hash_set.add (Hashtbl.find_exn df u) v
+  in
+  let rec visit u =
+    (* post order traversal of dom_tree *)
+    let dom_children = Hashtbl.find dom_tree u |> Option.value ~default:[] in
+    List.iter dom_children ~f:visit;
+    (* local frontier *)
+    Hashtbl.find graph u
+    |> Option.value ~default:[]
+    |> List.iter ~f:(fun v -> try_add_to_frontier u v);
+    (* upward frontier *)
+    List.iter dom_children ~f:(fun v ->
+      Hashtbl.find df v
+      |> Option.value_map ~default:[] ~f:Hash_set.to_list
+      |> List.iter ~f:(fun w -> try_add_to_frontier u w))
+  in
+  visit 0;
+  df
+;;
+
 let mem2reg_proc ~promotable { name; blocks } =
   let preds = predecessors blocks in
   let graph = successors preds in
-  let dominator_tree = Lengauer_tarjan.find_idoms ~graph ~preds in
+  let idoms = Lengauer_tarjan.find_idoms ~graph ~preds in
+  let dom_tree = invert_idoms idoms in
+  let dom_frontiers = find_frontiers ~graph ~idoms ~dom_tree in
   eprintf "proc: %s\n" (Symbol.get_exn name).name;
   eprintf "  succs:\n";
   Hashtbl.iteri graph ~f:(fun ~key ~data ->
@@ -130,8 +167,19 @@ let mem2reg_proc ~promotable { name; blocks } =
       "    L%d -> [%s]\n"
       key
       (List.map data ~f:(sprintf "L%d") |> String.concat ~sep:", "));
-  eprintf "  idoms:\n";
-  Hashtbl.iteri dominator_tree ~f:(fun ~key ~data -> eprintf "    L%d -> L%d\n" key data);
+  eprintf "  dom_tree:\n";
+  Hashtbl.iteri dom_tree ~f:(fun ~key ~data ->
+    eprintf
+      "    L%d -> [%s]\n"
+      key
+      (List.map data ~f:(sprintf "L%d") |> String.concat ~sep:", "));
+  eprintf "  dom_frontiers:\n";
+  Hashtbl.iteri dom_frontiers ~f:(fun ~key ~data ->
+    eprintf
+      "    L%d -> [%s]\n"
+      key
+      (Hash_set.to_list data |> List.map ~f:(sprintf "L%d") |> String.concat ~sep:", "));
+  (* TODO *)
   ignore promotable;
   ignore name;
   { name; blocks }
