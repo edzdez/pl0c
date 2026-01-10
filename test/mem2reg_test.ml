@@ -212,3 +212,40 @@ let%expect_test "works with complex control flow" =
       }
       |}])
 ;;
+
+let%expect_test "mixed promotion" =
+  In_channel.with_file "../examples/mem2reg_mixed.pl0" ~f:(fun fin ->
+    let lexbuf = Lexing.from_channel fin in
+    let ir = opt lexbuf in
+    printf "%s\n" (Ir.to_string ir);
+    [%expect
+      {|
+      proc _main {
+      L0:
+        call p
+        ret
+      }
+
+      proc p {
+      L0:
+        @x := alloca i32
+        @y := alloca i32
+        call q
+        %t0 := load ptr<i32> @y
+        %t1 := i32 %t0
+        store i32 %t1, ptr<i32> @y
+        %t2 := i32 %t0
+        %t3 := add i32 %t2, 1
+        %t4 := i32 %t3
+        write i32 %t4
+        ret
+      }
+
+      proc q {
+      L0:
+        store i32 0, ptr<i32> @x
+        store i32 1, ptr<i32> @y
+        ret
+      }
+      |}])
+;;
