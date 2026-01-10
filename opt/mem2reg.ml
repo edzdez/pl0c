@@ -154,7 +154,9 @@ let find_frontiers ~graph ~idoms ~dom_tree =
   df
 ;;
 
-let _mk_tmp ~p =
+let mk_i32 x = { kind = Lit x; ty = I32 }
+
+let mk_tmp ~p =
   let fresh (module T : Util.Temp.Temp) = T.fresh () in
   let tmp =
     match (Symbol.get_exn p).kind with
@@ -181,10 +183,11 @@ let insert_phis_for ~x ~dom_frontiers { blocks; _ } =
     |> List.iter ~f:(fun b ->
       if not @@ Hash_set.mem has_phi b
       then (
-        (* let dst = mk_tmp ~p:name in *)
-        (* dummy *)
         let phi =
-          { dst = { kind = Ptr x; ty = I32 }; srcs = Hashtbl.create (module Lbl) }
+          { dst = { kind = Ptr x; ty = I32 }
+          ; srcs = Hashtbl.create (module Lbl)
+          ; sym = x
+          }
         in
         let block = List.find_exn blocks ~f:(fun { label; _ } -> label = b) in
         block.joins <- phi :: block.joins;
@@ -193,41 +196,94 @@ let insert_phis_for ~x ~dom_frontiers { blocks; _ } =
   done
 ;;
 
+let rename ~graph ~dom_tree ~promotable { name; blocks } =
+  let stacks = Hashtbl.create (module Symbol) in
+  Hash_set.iter promotable ~f:(fun x -> Hashtbl.set stacks ~key:x ~data:[]);
+  let rename_block ({ label; joins; instrs; _ } as block) =
+    let delta = ref [] in
+    (* rename phis *)
+    List.iter joins ~f:(fun phi ->
+      match phi.dst.kind with
+      | Ptr x ->
+        let tmp = mk_tmp ~p:name in
+        phi.dst <- tmp;
+        Hashtbl.update stacks x ~f:(function
+          | None -> [ tmp ]
+          | Some stack -> tmp :: stack);
+        delta := (x, tmp) :: !delta
+      | _ -> ());
+    (* rename instructions *)
+    block.instrs
+    <- List.filter_map instrs ~f:(function
+         | Load { src = { kind = Ptr x; _ }; dst } as orig ->
+           (match Hashtbl.find stacks x with
+            | None -> Some orig
+            | Some stack ->
+              let src = List.hd stack |> Option.value ~default:(mk_i32 0l) in
+              Some (Assign { src; dst }))
+         | Store { dst = { kind = Ptr x; _ }; src } as orig ->
+           (match Hashtbl.find stacks x with
+            | None -> Some orig
+            | Some stack ->
+              let tmp =
+                match src.kind with
+                | Tmp _ -> src
+                | Lit n -> mk_i32 n
+                | _ -> failwith "unexpected src kind"
+              in
+              Hashtbl.set stacks ~key:x ~data:(tmp :: stack);
+              None)
+         | i -> Some i);
+    (* set successor phi operands *)
+    Hashtbl.find graph label
+    |> Option.value ~default:[]
+    |> List.iter ~f:(fun succ_lbl ->
+      let succ_block = List.find_exn blocks ~f:(fun { label; _ } -> label = succ_lbl) in
+      List.iter succ_block.joins ~f:(fun { srcs; sym; _ } ->
+        match Hashtbl.find srcs label with
+        | Some _ -> ()
+        | None ->
+          (match Hashtbl.find stacks sym with
+           | None -> ()
+           | Some tmp -> Hashtbl.add_exn srcs ~key:label ~data:(List.hd_exn tmp))));
+    !delta
+  in
+  let rec visit block =
+    let delta = rename_block block in
+    Hashtbl.find dom_tree block.label
+    |> Option.value ~default:[]
+    |> List.iter ~f:(fun child_lbl ->
+      let child_block = List.find_exn blocks ~f:(fun { label; _ } -> label = child_lbl) in
+      visit child_block);
+    List.iter delta ~f:(fun (x, _) ->
+      Hashtbl.update stacks x ~f:(function
+        | None | Some [] -> failwith "that's not supposed to happen!"
+        | Some (_ :: tl) -> tl))
+  in
+  (* visit entry *)
+  let entry_block = List.find_exn blocks ~f:(fun { label; _ } -> label = 0) in
+  visit entry_block
+;;
+
 let mem2reg_proc ~promotable ({ name; blocks } as proc) =
   let promotable =
     Hash_set.filter promotable ~f:(fun x ->
       Option.equal Symbol.equal (Symbol.get_exn x).owner (Some name))
-    |> Hash_set.to_list
   in
   let preds = predecessors blocks in
   let graph = successors preds in
   let idoms = Lengauer_tarjan.find_idoms ~graph ~preds in
   let dom_tree = invert_idoms idoms in
   let dom_frontiers = find_frontiers ~graph ~idoms ~dom_tree in
-  List.iter promotable ~f:(fun x -> insert_phis_for ~x ~dom_frontiers proc);
-  (* TODO *)
-  eprintf "proc: %s\n" (Symbol.get_exn name).name;
-  eprintf "  succs:\n";
-  Hashtbl.iteri graph ~f:(fun ~key ~data ->
-    eprintf
-      "    L%d -> [%s]\n"
-      key
-      (List.map data ~f:(sprintf "L%d") |> String.concat ~sep:", "));
-  eprintf "  dom_tree:\n";
-  Hashtbl.iteri dom_tree ~f:(fun ~key ~data ->
-    eprintf
-      "    L%d -> [%s]\n"
-      key
-      (List.map data ~f:(sprintf "L%d") |> String.concat ~sep:", "));
-  eprintf "  dom_frontiers:\n";
-  Hashtbl.iteri dom_frontiers ~f:(fun ~key ~data ->
-    eprintf
-      "    L%d -> [%s]\n"
-      key
-      (Hash_set.to_list data |> List.map ~f:(sprintf "L%d") |> String.concat ~sep:", "));
-  ignore promotable;
-  ignore name;
-  { name; blocks }
+  Hash_set.iter promotable ~f:(fun x -> insert_phis_for ~x ~dom_frontiers proc);
+  rename ~graph ~dom_tree ~promotable proc;
+  (* remove alloca nodes *)
+  let entry_block = List.find_exn blocks ~f:(fun { label; _ } -> label = 0) in
+  entry_block.instrs
+  <- List.filter entry_block.instrs ~f:(function
+       | Alloca { kind = Ptr x; _ } -> not @@ Hash_set.mem promotable x
+       | _ -> true);
+  proc
 ;;
 
 let mem2reg { globals; procedures } =

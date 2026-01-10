@@ -51,6 +51,7 @@ and block =
 and phi =
   { mutable dst : value
   ; srcs : (lbl, value) Hashtbl.t
+  ; sym : sym
   }
 
 and instr =
@@ -73,6 +74,7 @@ and instr =
   | Alloca of value
   | Store of unary
   | Load of unary
+  | Assign of unary
 
 and term =
   | Ret

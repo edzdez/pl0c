@@ -51,6 +51,7 @@ and block =
 and phi =
   { mutable dst : value
   ; srcs : (lbl, value) Hashtbl.t
+  ; sym : sym
   }
 
 and instr =
@@ -73,6 +74,7 @@ and instr =
   | Alloca of value
   | Store of unary
   | Load of unary
+  | Assign of unary
 
 and term =
   | Ret
@@ -111,7 +113,7 @@ let globals_to_string globals =
 
 let lbl_to_string i = sprintf "L%d" i
 
-let join_to_string { dst; srcs } =
+let join_to_string { dst; srcs; _ } =
   sprintf
     "  %s := phi %s %s"
     (kind_to_string dst.kind)
@@ -119,7 +121,7 @@ let join_to_string { dst; srcs } =
     (Hashtbl.to_alist srcs
      |> List.sort ~compare:(fun (l1, _) (l2, _) -> Int.compare l1 l2)
      |> List.map ~f:(fun (label, value) ->
-       sprintf "[%s, %s]" (value_to_string value) (lbl_to_string label))
+       sprintf "[%s, %s]" (kind_to_string value.kind) (lbl_to_string label))
      |> String.concat ~sep:", ")
 ;;
 
@@ -134,6 +136,10 @@ let binary_to_string ~op { dst; lhs; rhs } =
 
 let unary_to_string ~op { dst; src } =
   sprintf "%s := %s %s" (kind_to_string dst.kind) op (value_to_string src)
+;;
+
+let move_to_string { dst; src } =
+  sprintf "%s := %s" (kind_to_string dst.kind) (value_to_string src)
 ;;
 
 let instr_to_string = function
@@ -157,6 +163,7 @@ let instr_to_string = function
   | Store { dst; src } ->
     sprintf "store %s, %s" (value_to_string src) (value_to_string dst)
   | Load body -> unary_to_string ~op:"load" body
+  | Assign body -> move_to_string body
 ;;
 
 let terminator_to_string = function

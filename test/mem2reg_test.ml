@@ -28,10 +28,6 @@ let%expect_test "doesn't promote globals" =
         write i32 %t0
         ret
       }
-      proc: _main
-        succs:
-        dom_tree:
-        dom_frontiers:
       |}])
 ;;
 
@@ -73,18 +69,6 @@ let%expect_test "does not promote variables referenced in nested scopes" =
         write i32 %t0
         ret
       }
-      proc: _main
-        succs:
-        dom_tree:
-        dom_frontiers:
-      proc: inner
-        succs:
-        dom_tree:
-        dom_frontiers:
-      proc: outer
-        succs:
-        dom_tree:
-        dom_frontiers:
       |}])
 ;;
 
@@ -103,23 +87,12 @@ let%expect_test "works with linear code" =
 
       proc p {
       L0:
-        @z := alloca i32
-        store i32 1, ptr<i32> @z
-        %t0 := load ptr<i32> @z
+        %t0 := i32 1
         %t1 := add i32 %t0, 1
-        store i32 %t1, ptr<i32> @z
-        %t2 := load ptr<i32> @z
+        %t2 := i32 %t1
         write i32 %t2
         ret
       }
-      proc: _main
-        succs:
-        dom_tree:
-        dom_frontiers:
-      proc: p
-        succs:
-        dom_tree:
-        dom_frontiers:
       |}])
 ;;
 
@@ -138,37 +111,20 @@ let%expect_test "works on ifs" =
 
       proc p {
       L0:
-        @x := alloca i32
-        store i32 0, ptr<i32> @x
-        %t0 := load ptr<i32> @x
+        %t0 := i32 0
         %t1 := lt i32 %t0, 5
         br i1 %t1, label L1, label L2
 
       L1:
-        store i32 1, ptr<i32> @x
         jmp label L2
 
       L2:
-        @x := phi i32
+        %t3 := phi i32 [0, L0], [1, L1]
 
-        store i32 2, ptr<i32> @x
-        %t2 := load ptr<i32> @x
+        %t2 := i32 2
         write i32 %t2
         ret
       }
-      proc: _main
-        succs:
-        dom_tree:
-        dom_frontiers:
-      proc: p
-        succs:
-          L0 -> [L2, L1]
-          L1 -> [L2]
-        dom_tree:
-          L0 -> [L1, L2]
-        dom_frontiers:
-          L0 -> []
-          L1 -> [L2]
       |}])
 ;;
 
@@ -181,25 +137,22 @@ let%expect_test "works on while loops" =
       {|
       proc p {
       L0:
-        @i := alloca i32
-        store i32 0, ptr<i32> @i
         jmp label L1
 
       L1:
-        @i := phi i32
+        %t5 := phi i32 [0, L0], [%t3, L2]
 
-        %t0 := load ptr<i32> @i
+        %t0 := i32 %t5
         %t1 := lt i32 %t0, 10
         br i1 %t1, label L2, label L3
 
       L2:
-        %t2 := load ptr<i32> @i
+        %t2 := i32 %t5
         %t3 := add i32 %t2, 1
-        store i32 %t3, ptr<i32> @i
         jmp label L1
 
       L3:
-        %t4 := load ptr<i32> @i
+        %t4 := i32 %t5
         write i32 %t4
         ret
       }
@@ -209,22 +162,6 @@ let%expect_test "works on while loops" =
         call p
         ret
       }
-      proc: p
-        succs:
-          L0 -> [L1]
-          L2 -> [L1]
-          L1 -> [L3, L2]
-        dom_tree:
-          L0 -> [L1]
-          L1 -> [L3, L2]
-        dom_frontiers:
-          L0 -> []
-          L2 -> [L1]
-          L1 -> [L1]
-      proc: _main
-        succs:
-        dom_tree:
-        dom_frontiers:
       |}])
 ;;
 
@@ -243,62 +180,35 @@ let%expect_test "works with complex control flow" =
 
       proc p {
       L0:
-        @x := alloca i32
-        @y := alloca i32
-        store i32 0, ptr<i32> @x
-        store i32 0, ptr<i32> @y
         jmp label L1
 
       L1:
-        @x := phi i32
-        @y := phi i32
+        %t8 := phi i32 [0, L0], [%t7, L4]
+        %t9 := phi i32 [0, L0], [%t10, L4]
 
-        %t0 := load ptr<i32> @y
+        %t0 := i32 %t8
         %t1 := lt i32 %t0, 10
         br i1 %t1, label L2, label L5
 
       L2:
-        %t2 := load ptr<i32> @y
+        %t2 := i32 %t8
         %t3 := lt i32 %t2, 5
         br i1 %t3, label L3, label L4
 
       L3:
-        %t4 := load ptr<i32> @x
+        %t4 := i32 %t9
         %t5 := add i32 %t4, 1
-        store i32 %t5, ptr<i32> @x
         jmp label L4
 
       L4:
-        @x := phi i32
+        %t10 := phi i32 [%t9, L2], [%t5, L3]
 
-        %t6 := load ptr<i32> @y
+        %t6 := i32 %t8
         %t7 := add i32 %t6, 1
-        store i32 %t7, ptr<i32> @y
         jmp label L1
 
       L5:
         ret
       }
-      proc: _main
-        succs:
-        dom_tree:
-        dom_frontiers:
-      proc: p
-        succs:
-          L0 -> [L1]
-          L4 -> [L1]
-          L2 -> [L3, L4]
-          L3 -> [L4]
-          L1 -> [L2, L5]
-        dom_tree:
-          L0 -> [L1]
-          L2 -> [L3, L4]
-          L1 -> [L2, L5]
-        dom_frontiers:
-          L0 -> []
-          L4 -> [L1]
-          L2 -> [L1]
-          L3 -> [L4]
-          L1 -> [L1]
       |}])
 ;;
