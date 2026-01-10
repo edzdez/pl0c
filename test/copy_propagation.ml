@@ -1,0 +1,241 @@
+open! Core
+module P = Parse.Parser
+module L = Parse.Lexer
+module C = Opt.Fold_constants
+module S = Semant
+module M = Opt.Mem2reg
+module C_p = Opt.Copy_propagation
+module Mark = Util.Mark
+
+let opt lexbuf =
+  match P.program L.read lexbuf with
+  | None -> assert false
+  | Some ast -> S.semant ast |> C.fold |> Lower.lower |> M.mem2reg |> C_p.propagate
+;;
+
+let%expect_test "doesn't promote globals" =
+  In_channel.with_file "../examples/parse_simple.pl0" ~f:(fun fin ->
+    let lexbuf = Lexing.from_channel fin in
+    let ir = opt lexbuf in
+    printf "%s\n" (Ir.to_string ir);
+    [%expect
+      {|
+      @x := global i32
+
+      proc _main {
+      L0:
+        store i32 20, ptr<i32> @x
+        %t0 := load ptr<i32> @x
+        write i32 %t0
+        ret
+      }
+      |}])
+;;
+
+let%expect_test "does not promote variables referenced in nested scopes" =
+  In_channel.with_file "../examples/parse_declarationordering8.pl0" ~f:(fun fin ->
+    let lexbuf = Lexing.from_channel fin in
+    let ir = opt lexbuf in
+    printf "%s\n" (Ir.to_string ir);
+    [%expect
+      {|
+      @x := global i32
+
+      proc _main {
+      L0:
+        store i32 0, ptr<i32> @x
+        call outer
+        %t0 := load ptr<i32> @x
+        write i32 %t0
+        ret
+      }
+
+      proc inner {
+      L0:
+        %t0 := load ptr<i32> @x
+        %t1 := add i32 %t0, 1
+        store i32 %t1, ptr<i32> @x
+        %t2 := load ptr<i32> @y
+        %t3 := add i32 %t2, 1
+        store i32 %t3, ptr<i32> @y
+        ret
+      }
+
+      proc outer {
+      L0:
+        @y := alloca i32
+        store i32 0, ptr<i32> @y
+        call inner
+        %t0 := load ptr<i32> @y
+        write i32 %t0
+        ret
+      }
+      |}])
+;;
+
+let%expect_test "works with linear code" =
+  In_channel.with_file "../examples/mem2reg_straightline.pl0" ~f:(fun fin ->
+    let lexbuf = Lexing.from_channel fin in
+    let ir = opt lexbuf in
+    printf "%s\n" (Ir.to_string ir);
+    [%expect
+      {|
+      proc _main {
+      L0:
+        call p
+        ret
+      }
+
+      proc p {
+      L0:
+        %t0 := i32 1
+        %t1 := add i32 %t0, 1
+        write i32 %t1
+        ret
+      }
+      |}])
+;;
+
+let%expect_test "works on ifs" =
+  In_channel.with_file "../examples/mem2reg_if.pl0" ~f:(fun fin ->
+    let lexbuf = Lexing.from_channel fin in
+    let ir = opt lexbuf in
+    printf "%s\n" (Ir.to_string ir);
+    [%expect
+      {|
+      proc _main {
+      L0:
+        call p
+        ret
+      }
+
+      proc p {
+      L0:
+        %t0 := i32 0
+        %t1 := lt i32 %t0, 5
+        br i1 %t1, label L1, label L2
+
+      L1:
+        jmp label L2
+
+      L2:
+        %t3 := phi i32 [0, L0], [1, L1]
+
+        %t2 := i32 2
+        write i32 %t2
+        ret
+      }
+      |}])
+;;
+
+let%expect_test "works on while loops" =
+  In_channel.with_file "../examples/mem2reg_while.pl0" ~f:(fun fin ->
+    let lexbuf = Lexing.from_channel fin in
+    let ir = opt lexbuf in
+    printf "%s\n" (Ir.to_string ir);
+    [%expect
+      {|
+      proc p {
+      L0:
+        jmp label L1
+
+      L1:
+        %t5 := phi i32 [0, L0], [%t3, L2]
+
+        %t1 := lt i32 %t5, 10
+        br i1 %t1, label L2, label L3
+
+      L2:
+        %t3 := add i32 %t5, 1
+        jmp label L1
+
+      L3:
+        write i32 %t5
+        ret
+      }
+
+      proc _main {
+      L0:
+        call p
+        ret
+      }
+      |}])
+;;
+
+let%expect_test "works with complex control flow" =
+  In_channel.with_file "../examples/mem2reg_complex.pl0" ~f:(fun fin ->
+    let lexbuf = Lexing.from_channel fin in
+    let ir = opt lexbuf in
+    printf "%s\n" (Ir.to_string ir);
+    [%expect
+      {|
+      proc _main {
+      L0:
+        call p
+        ret
+      }
+
+      proc p {
+      L0:
+        jmp label L1
+
+      L1:
+        %t8 := phi i32 [0, L0], [%t7, L4]
+        %t9 := phi i32 [0, L0], [%t10, L4]
+
+        %t1 := lt i32 %t8, 10
+        br i1 %t1, label L2, label L5
+
+      L2:
+        %t3 := lt i32 %t8, 5
+        br i1 %t3, label L3, label L4
+
+      L3:
+        %t5 := add i32 %t9, 1
+        jmp label L4
+
+      L4:
+        %t10 := phi i32 [%t9, L2], [%t5, L3]
+
+        %t7 := add i32 %t8, 1
+        jmp label L1
+
+      L5:
+        ret
+      }
+      |}])
+;;
+
+let%expect_test "mixed promotion" =
+  In_channel.with_file "../examples/mem2reg_mixed.pl0" ~f:(fun fin ->
+    let lexbuf = Lexing.from_channel fin in
+    let ir = opt lexbuf in
+    printf "%s\n" (Ir.to_string ir);
+    [%expect
+      {|
+      proc _main {
+      L0:
+        call p
+        ret
+      }
+
+      proc p {
+      L0:
+        @x := alloca i32
+        @y := alloca i32
+        call q
+        %t0 := load ptr<i32> @y
+        store i32 %t0, ptr<i32> @y
+        %t3 := add i32 %t0, 1
+        write i32 %t3
+        ret
+      }
+
+      proc q {
+      L0:
+        store i32 0, ptr<i32> @x
+        store i32 1, ptr<i32> @y
+        ret
+      }
+      |}])
+;;
